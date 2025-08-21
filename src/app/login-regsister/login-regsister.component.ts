@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { NavbarComponent } from '../navbar/navbar.component';
+import { AuthService } from '../springboot-api-services/auth.service';
+import { HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-login-regsister',
   standalone: true,
-  imports: [CommonModule, FormsModule,NavbarComponent],
+  imports: [CommonModule, FormsModule, NavbarComponent, HttpClientModule],
   templateUrl: './login-regsister.component.html',
   styleUrls: ['./login-regsister.component.css'],
   animations: [
@@ -20,20 +22,23 @@ import { NavbarComponent } from '../navbar/navbar.component';
         animate('300ms ease-in', style({ opacity: 0, transform: 'translateY(20px)' }))
       ])
     ])
-  ]
+  ],
+  providers: [AuthService] // <-- Add this line
 })
 export class LoginRegsisterComponent {
+
   showLogin = true; // default screen = login
   selectedRole: string = 'patient'; // default role
 
-  // ✅ Toggle between login and register forms
+  constructor(private authService: AuthService) { }
+
   toggleForm() {
     this.showLogin = !this.showLogin;
   }
-  onGoogleLogin() {
-  alert('🚀 Google Login coming soon!');
-}
 
+  onGoogleLogin() {
+    alert('🚀 Google Login coming soon!');
+  }
 
   setRole(role: string) {
     this.selectedRole = role;
@@ -44,6 +49,11 @@ export class LoginRegsisterComponent {
   }
 
   onRegister(form: any) {
-    console.log('Register:', { ...form.value, role: this.selectedRole });
-  }
+    const data = { ...form.value, role: this.selectedRole };
+    this.authService.registerUser(data).subscribe({
+      next: (res: any) => console.log('Registered successfully', res),
+      error: (err) => console.error('Registration error', err)
+    });
+    this.showLogin=true;
+  } 
 }
