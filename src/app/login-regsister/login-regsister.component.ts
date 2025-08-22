@@ -5,6 +5,8 @@ import { trigger, transition, style, animate } from '@angular/animations';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { AuthService } from '../springboot-api-services/auth.service';
 import { HttpClientModule } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { AuthDB } from '../models/AuthDB';
 
 @Component({
   selector: 'app-login-regsister',
@@ -29,8 +31,12 @@ export class LoginRegsisterComponent {
 
   showLogin = true; // default screen = login
   selectedRole: string = 'patient'; // default role
+  form: AuthDB = {
+    email: '', password: '',
+    role: ''
+  }; // Initialize form object with default values
 
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService,private router:Router) { }
 
   toggleForm() {
     this.showLogin = !this.showLogin;
@@ -43,9 +49,23 @@ export class LoginRegsisterComponent {
   setRole(role: string) {
     this.selectedRole = role;
   }
-
   onLogin(form: any) {
-    console.log('Login:', form.value);
+  
+  const data = { ...form.value, role: this.selectedRole };
+
+  this.authService.loginUser(data).subscribe({
+    next: (res: any) => {
+      console.log('Login successful', res.Status);
+      localStorage.setItem('token', res.Token); // store JWT
+      this.router.navigate(['/dashboard']);
+    },
+    error: (err) => {
+      console.error('Login failed:', err);
+      alert('Invalid credentials');
+    }
+  });
+
+
   }
 
   onRegister(form: any) {
