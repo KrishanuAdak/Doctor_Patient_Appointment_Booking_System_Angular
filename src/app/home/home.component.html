@@ -1,2 +1,45 @@
 <app-navbar></app-navbar>
-<p>home works!</p>
+<div class="container mt-5">
+  <div id="homeCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+    <!-- Indicators -->
+    <div class="carousel-indicators">
+      <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="0" class="active"></button>
+      <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="1"></button>
+      <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="2"></button>
+    </div>
+
+    <!-- Slides -->
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <img src="https://cdn.pixabay.com/photo/2020/11/03/15/31/doctor-5710152_1280.jpg" class="d-block w-100" alt="Slide 1">
+        <div class="carousel-caption d-none d-md-block">
+          <h5 class="animate__animated animate__fadeInDown">Welcome to Our App</h5>
+          <p class="animate__animated animate__fadeInUp">Book appointments with ease!</p>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <img src="https://cdn.pixabay.com/photo/2025/05/29/08/25/doctor-9628974_1280.jpg" class="d-block w-100" alt="Slide 2">
+        <div class="carousel-caption d-none d-md-block">
+          <h5 class="animate__animated animate__fadeInDown">Find Nearby Doctors</h5>
+          <p class="animate__animated animate__fadeInUp">Based on your location.</p>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <img src="https://cdn.pixabay.com/photo/2023/08/03/15/41/spine-center-in-fremont-8167473_1280.jpg" class="d-block w-100" alt="Slide 3">
+        <div class="carousel-caption d-none d-md-block">
+          <h5 class="animate__animated animate__fadeInDown">Easy & Fast</h5>
+          <p class="animate__animated animate__fadeInUp">Manage appointments anytime.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#homeCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#homeCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon"></span>
+    </button>
+  </div>
+</div>
+

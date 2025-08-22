@@ -32,8 +32,8 @@ import { AuthService } from '../springboot-api-services/auth.service'; // Adjust
 export class DashboardComponent {
   username: string | null = null;
   constructor(private authService: AuthService) {
-      this.username = localStorage.getItem('sub');
-      console.log(this.username);
+      this.username = localStorage.getItem('token');
+      console.log('username',this.username);
    }
 
   
