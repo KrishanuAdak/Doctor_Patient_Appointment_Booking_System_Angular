@@ -71,7 +71,7 @@ export class LoginRegsisterComponent {
   onRegister(form: any) {
     const data = { ...form.value, role: this.selectedRole };
     this.authService.registerUser(data).subscribe({
-      next: (res: any) => console.log('Registered successfully', res),
+      next: (res: any) => alert('Registration successful! Please log in.'),
       error: (err) => console.error('Registration error', err)
     });
     this.showLogin=true;

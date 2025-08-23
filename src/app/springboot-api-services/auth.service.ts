@@ -11,9 +11,9 @@ export class AuthService {
   constructor(private http:HttpClient) { 
     this.http=http;
   }
-  private auth_register_url= 'http://localhost:7979/auth-service/register';
+  private auth_register_url= 'http://93.127.198.116:7979/auth-service/register';
 
-  private auth_login_url= 'http://localhost:7979/auth-service/login';
+  private auth_login_url= 'http://93.127.198.116:7979/auth-service/login';
 
   registerUser(data:AuthDB):Observable<any>
   { 
