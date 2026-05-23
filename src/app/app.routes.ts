@@ -3,6 +3,8 @@ import { HomeComponent } from './home/home.component';
 import { ServicesComponent } from './services/services.component';
 import { LoginRegsisterComponent } from './login-regsister/login-regsister.component';
 import { authGuard } from './auth.guard';
+import { AvailibityServiceComponent } from './availibity-service/availibity-service.component';
+import { BasicDetailsComponent } from './basic-details/basic-details.component';
 
 export const routes: Routes = [
     {
@@ -34,5 +36,18 @@ export const routes: Routes = [
     {
         path:'services',
         component:ServicesComponent
+    },{
+        path:'available',
+        component:AvailibityServiceComponent,
+        // loadComponent: () => import('./availability/availability.component').then(m => m.AvailabilityComponent),
+        canActivate:[authGuard]
+    },{
+        path:'appointments',
+        loadComponent: () => import('./appointment-booking/appointment-booking.component').then(m => m.AppointmentBookingComponent),
+        canActivate:[authGuard]
+    },{
+        path:'accounts',
+        component:BasicDetailsComponent,
+        canActivate:[authGuard]
     }
 ];

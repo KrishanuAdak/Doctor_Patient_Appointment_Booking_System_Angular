@@ -1,45 +1,244 @@
-<app-navbar></app-navbar>
-<div class="container mt-5">
-  <div id="homeCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
-    <!-- Indicators -->
-    <div class="carousel-indicators">
-      <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="0" class="active"></button>
-      <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="1"></button>
-      <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="2"></button>
-    </div>
+<!-- 🌌 HERO (Premium Gradient + Glass UI) -->
+<!-- 🧭 PREMIUM NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top premium-navbar px-4">
 
-    <!-- Slides -->
-    <div class="carousel-inner">
-      <div class="carousel-item active">
-        <img src="https://cdn.pixabay.com/photo/2020/11/03/15/31/doctor-5710152_1280.jpg" class="d-block w-100" alt="Slide 1">
-        <div class="carousel-caption d-none d-md-block">
-          <h5 class="animate__animated animate__fadeInDown">Welcome to Our App</h5>
-          <p class="animate__animated animate__fadeInUp">Book appointments with ease!</p>
-        </div>
-      </div>
-      <div class="carousel-item">
-        <img src="https://cdn.pixabay.com/photo/2025/05/29/08/25/doctor-9628974_1280.jpg" class="d-block w-100" alt="Slide 2">
-        <div class="carousel-caption d-none d-md-block">
-          <h5 class="animate__animated animate__fadeInDown">Find Nearby Doctors</h5>
-          <p class="animate__animated animate__fadeInUp">Based on your location.</p>
-        </div>
-      </div>
-      <div class="carousel-item">
-        <img src="https://cdn.pixabay.com/photo/2023/08/03/15/41/spine-center-in-fremont-8167473_1280.jpg" class="d-block w-100" alt="Slide 3">
-        <div class="carousel-caption d-none d-md-block">
-          <h5 class="animate__animated animate__fadeInDown">Easy & Fast</h5>
-          <p class="animate__animated animate__fadeInUp">Manage appointments anytime.</p>
-        </div>
-      </div>
-    </div>
+  <a class="navbar-brand fw-bold">MediCare</a>
 
-    <!-- Controls -->
-    <button class="carousel-control-prev" type="button" data-bs-target="#homeCarousel" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon"></span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#homeCarousel" data-bs-slide="next">
-      <span class="carousel-control-next-icon"></span>
-    </button>
+  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="nav">
+
+    <ul class="navbar-nav ms-auto me-3">
+      <li class="nav-item"><a class="nav-link active">Home</a></li>
+      <li class="nav-item"><a class="nav-link">Find Doctors</a></li>
+      <li class="nav-item"><a class="nav-link">Hospitals</a></li>
+      <li class="nav-item"><a class="nav-link">Services</a></li>
+    </ul>
+
+    <button class="btn btn-outline-light me-2" (click)="loginOrSignup()">Login</button>
+    <button class="btn btn-success premium-btn">Book Appointment</button>
+
   </div>
-</div>
+</nav>
+<section class="hero-premium d-flex align-items-center text-center text-white">
+  <div class="container">
 
+    <h1 class="display-4 fw-bold mb-4 animate-fade">
+      Smart Healthcare, Simplified
+    </h1>
+
+    <p class="lead mb-4 animate-fade delay-1">
+      Book doctors, consult online, manage records — all in one place
+    </p>
+
+    <div class="row justify-content-center g-3 animate-fade delay-2">
+
+      <div class="col-md-4">
+        <input class="form-control glass-input" placeholder="Search doctors..." />
+      </div>
+
+      <div class="col-md-3">
+        <input class="form-control glass-input" placeholder="Location" />
+      </div>
+
+      <div class="col-md-2">
+        <button class="btn btn-light w-100 fw-bold premium-btn">
+          Search
+        </button>
+      </div>
+
+    </div>
+
+    <button class="btn btn-success mt-4 premium-btn">
+      🤖 AI Consultation
+    </button>
+
+  </div>
+</section>
+
+<!-- 🧊 FEATURE CARDS (Glassmorphism) -->
+<section class="container py-5 text-center">
+  <h2 class="fw-bold mb-5">Everything You Need</h2>
+
+  <div class="row g-4">
+    <div class="col-md-4" *ngFor="let item of features">
+      <div class="glass-card p-4 h-100">
+
+        <div class="icon-glow mb-3">{{item.icon}}</div>
+
+        <h5 class="fw-semibold">{{item.title}}</h5>
+        <p class="text-muted small">{{item.desc}}</p>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ⭐ PREMIUM REVIEWS -->
+<section class="py-5 text-center bg-light">
+  <h2 class="fw-bold mb-4">Loved by Patients</h2>
+
+  <div class="container">
+    <div class="row g-4">
+
+      <div class="col-md-4" *ngFor="let review of reviews">
+        <div class="review-card p-4">
+
+          <div class="mb-2">⭐⭐⭐⭐⭐</div>
+
+          <p class="text-muted">{{review.text}}</p>
+          <h6 class="fw-bold">{{review.name}}</h6>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- 📊 PREMIUM STATS -->
+<section class="stats-premium text-center py-5">
+
+  <div class="container">
+    <div class="row">
+
+      <div class="col-md-3" *ngFor="let stat of stats">
+        <div class="stat-card">
+
+          <h2 class="fw-bold">{{stat.value}}</h2>
+          <p>{{stat.label}}</p>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</section>
+
+<!-- 🚀 CTA -->
+<section class="cta-premium text-center text-white py-5">
+  <h3 class="fw-bold">Experience Next-Gen Healthcare</h3>
+  <button class="btn btn-light mt-3 premium-btn">
+    Get Started
+  </button>
+</section>
+
+<!-- 💬 FLOATING CHAT -->
+<!-- 💬 FLOATING CHAT BUTTON -->
+
+<button
+  type="button"
+  class="chat-btn"
+  (click)="toggleChat()">
+
+  🤖
+
+</button>
+
+<!-- 💬 CHAT WINDOW -->
+
+<div
+  class="chat-window"
+  *ngIf="showChat">
+
+  <!-- HEADER -->
+
+  <div class="chat-header">
+
+    <span>AI Medical Assistant</span>
+
+    <button
+      type="button"
+      class="close-btn"
+      (click)="toggleChat()">
+
+      ✖
+
+    </button>
+
+  </div>
+
+  <!-- BODY -->
+
+  <div class="chat-body">
+
+    <!-- WELCOME -->
+
+    <div
+      class="bot-msg"
+      *ngIf="messages.length === 0">
+
+      👋 Hi! I’m MediCare AI Assistant.
+
+      <br><br>
+
+      Ask me about:
+
+      <br>
+
+      • Doctors
+      <br>
+      • Hospitals
+      <br>
+      • Symptoms
+      <br>
+      • Appointments
+
+    </div>
+
+    <!-- CHAT MESSAGES -->
+
+    <div
+      *ngFor="let msg of messages"
+      [ngClass]="msg.role">
+
+      {{ msg.content }}
+
+    </div>
+
+    <!-- TYPING -->
+
+    <div
+      *ngIf="loading"
+      class="typing">
+
+      AI is typing...
+
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+
+  <div class="chat-footer">
+
+    <input
+
+      #msg
+
+      type="text"
+
+      [value]="userMessage"
+
+      (input)="userMessage = msg.value"
+
+      (keyup.enter)="sendMessage()"
+
+      placeholder="Ask about doctors, symptoms..."
+
+    />
+
+    <button
+      type="button"
+      (click)="sendMessage()">
+
+      Send
+
+    </button>
+
+  </div>
+
+</div>

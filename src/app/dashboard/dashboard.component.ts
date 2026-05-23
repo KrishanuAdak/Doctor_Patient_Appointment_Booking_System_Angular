@@ -6,11 +6,15 @@ import { HttpClientModule } from '@angular/common/http';
 import { AuthService } from '../springboot-api-services/auth.service'; // Adjust the path as necessary
 // Or, if it's in 'src/app/services/auth.service.ts':
 // import { AuthService } from '../services/auth.service';
+import jwtDecode from 'jwt-decode';
+import { RouterLink } from "@angular/router";
+import { DashboardNavbarComponent } from "../dashboard-navbar/dashboard-navbar.component";
+
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule,HttpClientModule],
+  imports: [CommonModule, HttpClientModule, RouterLink, DashboardNavbarComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
    animations: [
@@ -31,10 +35,13 @@ import { AuthService } from '../springboot-api-services/auth.service'; // Adjust
 })
 export class DashboardComponent {
   username: string | null = null;
+  userRole: string | null = null;
   constructor(private authService: AuthService) {
-      this.username = localStorage.getItem('token');
+      this.username = this.authService.getUsername();
+      this.userRole = this.authService.extractUserRole();
       console.log('username',this.username);
-   }
+      console.log('userRole',this.userRole);
+  }
 
   
 

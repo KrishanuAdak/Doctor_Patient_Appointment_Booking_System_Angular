@@ -28,52 +28,45 @@ import { AuthDB } from '../models/AuthDB';
   providers: [AuthService] // <-- Add this line
 })
 export class LoginRegsisterComponent {
+password: any;
+  constructor(private authService: AuthService, private router: Router) {}
 
-  showLogin = true; // default screen = login
-  selectedRole: string = 'patient'; // default role
-  form: AuthDB = {
-    email: '', password: '',
-    role: ''
-  }; // Initialize form object with default values
+  isLogin = true;
+  role: 'patient' | 'doctor' = 'patient';
+  UserDetails: AuthDB = {
+    email: '',
+    password: '',
+    role: this.role
+  };
 
-  constructor(private authService: AuthService,private router:Router) { }
-
-  toggleForm() {
-    this.showLogin = !this.showLogin;
+  toggleMode() {
+    this.isLogin = !this.isLogin;
   }
 
-  onGoogleLogin() {
-    alert('🚀 Google Login coming soon!');
+  setRole(r: 'patient' | 'doctor') {
+    this.role = r;
   }
-
-  setRole(role: string) {
-    this.selectedRole = role;
-  }
-  onLogin(form: any) {
-  
-  const data = { ...form.value, role: this.selectedRole };
-
-  this.authService.loginUser(data).subscribe({
-    next: (res: any) => {
-      console.log('Login successful', res.Status);
-      localStorage.setItem('token', res.Token); // store JWT
-      this.router.navigate(['/dashboard']);
-    },
-    error: (err) => {
-      console.error('Login failed:', err);
-      alert('Invalid credentials');
+  submitForm() {
+    if(this.isLogin){
+      this.authService.loginUser(this.UserDetails).subscribe({
+        next: (res) => {
+          console.log('Login successful:', res);
+        },
+        error: (err) => {
+          console.error('Login failed:', err);
+        }
+      });
+    } else {
+      this.authService.registerUser(this.UserDetails).subscribe({
+        next: (res) => {
+          console.log('Registration successful:', res);
+        },
+        error: (err) => {
+          console.error('Registration failed:', err);
+        }
+      });
     }
-  });
-
-
   }
-
-  onRegister(form: any) {
-    const data = { ...form.value, role: this.selectedRole };
-    this.authService.registerUser(data).subscribe({
-      next: (res: any) => alert('Registration successful! Please log in.'),
-      error: (err) => console.error('Registration error', err)
-    });
-    this.showLogin=true;
-  } 
+  
+ 
 }

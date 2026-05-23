@@ -1,0 +1,54 @@
+ <nav class="navbar" >
+   <div class="navbar-brand"><a href="/dashboard">🏥 Doctor-Patient Portal</a></div>
+  <ul class="navbar-links">
+    <li><a routerLink="/accounts" routerLinkActive="active">Accounts</a></li>
+    <li><a routerLink="/history" routerLinkActive="active">History</a></li>
+    <li><a href="/appointments" routerLinkActive="active" target="_blank" *ngIf="userRole?.toLocaleLowerCase() === 'patient'">Appointments</a></li>
+    <li>          <a class="nav-link" href="/available" routerLinkActive="active" *ngIf="userRole?.toLocaleLowerCase() === 'doctor'">Your availability
+    </a>
+</li>
+    <li><a routerLink="/stories" routerLinkActive="active">Stories</a></li>
+    <li><button (click)="logout()" class="logout-btn">Logout</button></li>
+  </ul>
+</nav> 
+
+<div class="appointment-wrapper" [@fadeInAnimation]>
+  <mat-card class="appointment-card">
+    <mat-card-title>Book an Appointment</mat-card-title>
+    <mat-card-content>
+      <form [formGroup]="appointmentForm" (ngSubmit)="bookAppointment()">
+        
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Select Doctor</mat-label>
+          <mat-select formControlName="doctorId">
+            <mat-option *ngFor="let doc of doctors" [value]="doc.id">
+              {{ doc.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Appointment Date</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="appointmentDate">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Appointment Time</mat-label>
+          <input matInput type="time" formControlName="appointmentTime">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Reason</mat-label>
+          <textarea matInput formControlName="reason" rows="3"></textarea>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" type="submit" [disabled]="isLoading">
+          <mat-progress-spinner *ngIf="isLoading" mode="indeterminate" diameter="20"></mat-progress-spinner>
+          <span *ngIf="!isLoading">Book Appointment</span>
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
