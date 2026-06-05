@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { AuthDB } from '../models/AuthDB';
 import { Observable } from 'rxjs';
 import {jwtDecode} from 'jwt-decode';
-import { environment } from '../../environments/environment.prod';
+import { environment } from '../../environments/environment';
 // import { environment } from  'src/environments/environment.prod.ts';
 
 @Injectable({
@@ -20,10 +20,10 @@ export class AuthService {
 
     this.http=http;
   }
-  private auth_register_url= '${this.apiBaseUrl}/auth-service/register';
+  private auth_register_url= `${this.apiBaseUrl}/auth-service/register`;
 
-  private auth_login_url= '${this.apiBaseUrl}/auth-service/login';
-  private chat_api_url = '${this.apiBaseUrl}/ai/ask';
+  private auth_login_url= `${this.apiBaseUrl}/auth-service/login`;
+  private chat_api_url = `${this.apiBaseUrl}/ai/ask`;
 
   registerUser(data:AuthDB):Observable<any>
   { 
