@@ -16,11 +16,11 @@ export class AuthService {
   constructor(private http:HttpClient) { 
     this.http=http;
   }
-  private auth_register_url= 'http://localhost:7979/auth-service/register';
+  private auth_register_url= 'http://api.appointment-easy-bengal.in:7979/auth-service/register';
 
-  private auth_login_url= 'http://localhost:7979/auth-service/login';
-  private chat_api_url = 'http://localhost:7001/ai/ask';
-  
+  private auth_login_url= 'http://api.appointment-easy-bengal.in:7979/auth-service/login';
+  private chat_api_url = 'http://api.appointment-easy-bengal.in:7001/ai/ask';
+
   registerUser(data:AuthDB):Observable<any>
   { 
     return this.http.post<any>(this.auth_register_url,data);
@@ -28,11 +28,11 @@ export class AuthService {
 
   }
   getCountsofCompletedAppointments():Observable<number>{
-    return this.http.get<number>('http://localhost:5959/appointment/v1/appointments/count');
+    return this.http.get<number>('http://api.appointment-easy-bengal.in:5959/appointment/v1/appointments/count');
 
   }
   getCountsOfVerifiedDoctors():Observable<number>{
-    return this.http.get<number>('http://localhost:8085/doctor/verified-doctor/counts');
+    return this.http.get<number>('http://api.appointment-easy-bengal.in:8085/doctor/verified-doctor/counts');
   }
 
   loginUser(data: AuthDB):Observable<any>{
