@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { AuthDB } from '../models/AuthDB';
 import { Observable } from 'rxjs';
 import {jwtDecode} from 'jwt-decode';
+import { environment } from '../../environments/environment.prod';
+// import { environment } from  'src/environments/environment.prod.ts';
 
 @Injectable({
   providedIn: 'root'
@@ -12,14 +14,16 @@ export class AuthService {
     (role: string, username: any, password: any) {
       throw new Error('Method not implemented.');
   }
+    private apiBaseUrl = environment.apiBaseUrl;
 
-  constructor(private http:HttpClient) { 
+  constructor(private http:HttpClient) {
+
     this.http=http;
   }
-  private auth_register_url= 'http://api.appointment-easy-bengal.in:7979/auth-service/register';
+  private auth_register_url= '${this.apiBaseUrl}/auth-service/register';
 
-  private auth_login_url= 'http://api.appointment-easy-bengal.in:7979/auth-service/login';
-  private chat_api_url = 'http://api.appointment-easy-bengal.in:7001/ai/ask';
+  private auth_login_url= '${this.apiBaseUrl}/auth-service/login';
+  private chat_api_url = '${this.apiBaseUrl}/ai/ask';
 
   registerUser(data:AuthDB):Observable<any>
   { 
