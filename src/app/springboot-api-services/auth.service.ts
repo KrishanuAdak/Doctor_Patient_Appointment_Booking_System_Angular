@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { AuthDB } from '../models/AuthDB';
 import { Observable } from 'rxjs';
 import {jwtDecode} from 'jwt-decode';
-import { environment } from '../../environments/environment';
+import { environment } from '../../environments/environment.prod';
 // import { environment } from  'src/environments/environment.prod.ts';
 
 @Injectable({
