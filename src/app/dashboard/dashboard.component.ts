@@ -1,5 +1,11 @@
 import { Component } from '@angular/core';
-import { trigger, state, style, transition, animate } from '@angular/animations';
+import {
+  trigger,
+  state,
+  style,
+  transition,
+  animate,
+} from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 // Update the path if 'auth.service.ts' is located elsewhere, for example:
@@ -7,50 +13,59 @@ import { AuthService } from '../springboot-api-services/auth.service'; // Adjust
 // Or, if it's in 'src/app/services/auth.service.ts':
 // import { AuthService } from '../services/auth.service';
 import jwtDecode from 'jwt-decode';
-import { Router, RouterLink } from "@angular/router";
-import { DashboardNavbarComponent } from "../dashboard-navbar/dashboard-navbar.component";
+import { Router, RouterLink } from '@angular/router';
+import { DashboardNavbarComponent } from '../dashboard-navbar/dashboard-navbar.component';
 import { Doctor } from '../models/Doctor';
-
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, RouterLink, DashboardNavbarComponent],
+  imports: [
+    CommonModule,
+    HttpClientModule,
+    RouterLink,
+    DashboardNavbarComponent,
+  ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
-   animations: [
+  animations: [
     trigger('cardAnim', [
       state('in', style({ transform: 'scale(1)', opacity: 1 })),
       transition('void => *', [
         style({ transform: 'scale(0.8)', opacity: 0 }),
-        animate('400ms ease-out')
-      ])
+        animate('400ms ease-out'),
+      ]),
     ]),
     trigger('fadeIn', [
       transition(':enter', [
         style({ opacity: 0 }),
-        animate('600ms ease-in', style({ opacity: 1 }))
-      ])
-    ])
-  ]
+        animate('600ms ease-in', style({ opacity: 1 })),
+      ]),
+    ]),
+  ],
 })
 export class DashboardComponent {
-  
   username: string | null = null;
   userRole: string | null = null;
   doctors: Doctor[] = [];
-  constructor(private authService: AuthService,private route:Router) {
-      //this.username = this.authService.getUsername();
-     // this.userRole = this.authService.extractUserRole();
-      console.log('username',this.username);
-      console.log('userRole',this.userRole);
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+  ) {
+    //this.username = this.authService.getUsername();
+    // this.userRole = this.authService.extractUserRole();
+    console.log('username', this.username);
+    console.log('userRole', this.userRole);
   }
 
-  
-
-   logout(){
-    this.authService.logout();
-    this.route.navigate(['/login/register']);
-
-   }
+  logout() {
+    this.authService.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/login/register']); // ← navigate AFTER backend confirms
+      },
+      error: () => {
+        this.router.navigate(['/login/register']); // ← navigate on error too
+      },
+    });
+  }
 }
