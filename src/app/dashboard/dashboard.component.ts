@@ -9,6 +9,7 @@ import { AuthService } from '../springboot-api-services/auth.service'; // Adjust
 import jwtDecode from 'jwt-decode';
 import { RouterLink } from "@angular/router";
 import { DashboardNavbarComponent } from "../dashboard-navbar/dashboard-navbar.component";
+import { Doctor } from '../models/Doctor';
 
 
 @Component({
@@ -34,8 +35,10 @@ import { DashboardNavbarComponent } from "../dashboard-navbar/dashboard-navbar.c
   ]
 })
 export class DashboardComponent {
+  
   username: string | null = null;
   userRole: string | null = null;
+  doctors: Doctor[] = [];
   constructor(private authService: AuthService) {
       //this.username = this.authService.getUsername();
      // this.userRole = this.authService.extractUserRole();
