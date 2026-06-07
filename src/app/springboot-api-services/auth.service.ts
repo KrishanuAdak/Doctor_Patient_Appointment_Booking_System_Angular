@@ -1,22 +1,27 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AuthDB } from '../models/AuthDB';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from '../../environments/environment.prod';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
-
   private apiBaseUrl = environment.apiBaseUrl;
 
   private auth_register_url = `${this.apiBaseUrl}/auth-service/register`;
-  private auth_login_url    = `${this.apiBaseUrl}/auth-service/login`;
-  private auth_logout_url   = `${this.apiBaseUrl}/auth-service/logout`;
-  private chat_api_url      = `${this.apiBaseUrl}/ai/ask`;
+  private auth_login_url = `${this.apiBaseUrl}/auth-service/login`;
+  private auth_logout_url = `${this.apiBaseUrl}/auth-service/logout`;
+  private chat_api_url = `${this.apiBaseUrl}/ai/ask`;
 
   constructor(private http: HttpClient) {}
+  private loggedIn = new BehaviorSubject<boolean>(false); // ← default false
+  isLoggedIn$ = this.loggedIn.asObservable(); // ← expose as observable
+
+  setLoggedIn(value: boolean) {
+    this.loggedIn.next(value);
+  }
 
   // ─────────────────────────────────────────
   // REGISTER
@@ -24,7 +29,7 @@ export class AuthService {
   // ─────────────────────────────────────────
   registerUser(data: AuthDB): Observable<any> {
     return this.http.post<any>(this.auth_register_url, data, {
-      withCredentials: true  // ← receives HttpOnly cookie from Spring Boot
+      withCredentials: true, // ← receives HttpOnly cookie from Spring Boot
     });
   }
 
@@ -34,7 +39,7 @@ export class AuthService {
   // ─────────────────────────────────────────
   loginUser(data: AuthDB): Observable<any> {
     return this.http.post<any>(this.auth_login_url, data, {
-      withCredentials: true  // ← receives HttpOnly cookie from Spring Boot
+      withCredentials: true, // ← receives HttpOnly cookie from Spring Boot
     });
   }
 
@@ -44,9 +49,13 @@ export class AuthService {
   // Never manually clear localStorage — cookie is managed by server
   // ─────────────────────────────────────────
   logout(): Observable<any> {
-    return this.http.post<any>(this.auth_logout_url, {}, {
-      withCredentials: true  // ← server clears the cookie
-    });
+    return this.http.post<any>(
+      this.auth_logout_url,
+      {},
+      {
+        withCredentials: true, // ← server clears the cookie
+      },
+    );
   }
 
   // ─────────────────────────────────────────
@@ -56,8 +65,11 @@ export class AuthService {
   // ─────────────────────────────────────────
   isLoggedIn(): Observable<boolean> {
     return this.http.get<boolean>(`${this.apiBaseUrl}/auth-service/validate`, {
-      withCredentials: true  // ← sends cookie automatically
+      withCredentials: true, // ← sends cookie automatically
     });
+  }
+  isLoggedInLocally(): boolean {
+    return this.loggedIn.getValue();
   }
 
   // ─────────────────────────────────────────
@@ -66,7 +78,7 @@ export class AuthService {
   // ─────────────────────────────────────────
   getProfile(): Observable<any> {
     return this.http.get<any>(`${this.apiBaseUrl}/auth-service/profile`, {
-      withCredentials: true
+      withCredentials: true,
     });
   }
 
@@ -75,13 +87,13 @@ export class AuthService {
   // ─────────────────────────────────────────
   getCountsofCompletedAppointments(): Observable<number> {
     return this.http.get<number>(
-      `${this.apiBaseUrl}/appointment/v1/appointments/count`
+      `${this.apiBaseUrl}/appointment/v1/appointments/count`,
     );
   }
 
   getCountsOfVerifiedDoctors(): Observable<number> {
     return this.http.get<number>(
-      `${this.apiBaseUrl}/doctor/verified-doctor/counts`
+      `${this.apiBaseUrl}/doctor/verified-doctor/counts`,
     );
   }
 
@@ -93,7 +105,7 @@ export class AuthService {
     return this.http.get(this.chat_api_url, {
       params,
       responseType: 'text',
-      withCredentials: true  // ← sends cookie if chat is protected
+      withCredentials: true, // ← sends cookie if chat is protected
     });
   }
 }

@@ -59,13 +59,15 @@ export class DashboardComponent {
   }
 
   logout() {
-    this.authService.logout().subscribe({
-      next: () => {
-        this.router.navigate(['/login/register']); // ← navigate AFTER backend confirms
-      },
-      error: () => {
-        this.router.navigate(['/login/register']); // ← navigate on error too
-      },
-    });
-  }
+  this.authService.logout().subscribe({
+    next: () => {
+      this.authService.setLoggedIn(false); // ← mark as logged out
+      this.router.navigate(['/login/register']);
+    },
+    error: () => {
+      this.authService.setLoggedIn(false);
+      this.router.navigate(['/login/register']);
+    }
+  });
+}
 }

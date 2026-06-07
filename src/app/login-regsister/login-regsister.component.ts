@@ -5,10 +5,9 @@ import { AuthService } from '../springboot-api-services/auth.service'; // adjust
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
-
 @Component({
   selector: 'app-auth',
-  standalone:true,
+  standalone: true,
   imports: [FormsModule, CommonModule],
   templateUrl: './login-regsister.component.html',
   styleUrls: ['./login-regsister.component.scss'],
@@ -16,16 +15,15 @@ import { CommonModule } from '@angular/common';
     trigger('slideDown', [
       transition(':enter', [
         style({ maxHeight: '0', opacity: 0 }),
-        animate('350ms ease', style({ maxHeight: '200px', opacity: 1 }))
+        animate('350ms ease', style({ maxHeight: '200px', opacity: 1 })),
       ]),
       transition(':leave', [
-        animate('300ms ease', style({ maxHeight: '0', opacity: 0 }))
-      ])
-    ])
-  ]
+        animate('300ms ease', style({ maxHeight: '0', opacity: 0 })),
+      ]),
+    ]),
+  ],
 })
 export class LoginRegisterComponent implements OnInit {
-
   isLogin: boolean = true;
   role: string = 'patient';
   showPassword: boolean = false;
@@ -37,12 +35,12 @@ export class LoginRegisterComponent implements OnInit {
     name: '',
     email: '',
     password: '',
-    phone: ''
+    phone: '',
   };
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit(): void {}
@@ -82,22 +80,17 @@ export class LoginRegisterComponent implements OnInit {
     const payload = {
       email: this.userDetails.email,
       password: this.userDetails.password,
-      role: this.role
+      role: this.role,
     };
 
     this.authService.loginUser(payload).subscribe({
-      next: (res) => {
-        // JWT is set as HttpOnly cookie by Spring Boot
-        // Angular never stores or reads the token
-        console.log('Login success:', res);
-        this.isLoading = false;
-        this.showSuccess();
+      next: (response) => {
+        this.authService.setLoggedIn(true); // ← mark as logged in
+        this.router.navigate(['/dashboard']);
       },
       error: (err) => {
-        this.isLoading = false;
-        this.errorMessage = err?.error?.message || 'Invalid email or password.';
-        console.error('Login error:', err);
-      }
+        console.error('Login failed', err);
+      },
     });
   }
 
@@ -109,7 +102,7 @@ export class LoginRegisterComponent implements OnInit {
       email: this.userDetails.email,
       password: this.userDetails.password,
       phone: this.userDetails.phone,
-      role: this.role
+      role: this.role,
     };
 
     this.authService.registerUser(payload).subscribe({
@@ -121,9 +114,10 @@ export class LoginRegisterComponent implements OnInit {
       },
       error: (err) => {
         this.isLoading = false;
-        this.errorMessage = err?.error?.message || 'Registration failed. Please try again.';
+        this.errorMessage =
+          err?.error?.message || 'Registration failed. Please try again.';
         console.error('Register error:', err);
-      }
+      },
     });
   }
 
@@ -145,7 +139,7 @@ export class LoginRegisterComponent implements OnInit {
       name: '',
       email: '',
       password: '',
-      phone: ''
+      phone: '',
     };
     this.showPassword = false;
     this.submitSuccess = false;
