@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component';
 import { ServicesComponent } from './services/services.component';
-import { LoginRegsisterComponent } from './login-regsister/login-regsister.component';
+import { LoginRegisterComponent } from './login-regsister/login-regsister.component';
 import { authGuard } from './auth.guard';
 import { AvailibityServiceComponent } from './availibity-service/availibity-service.component';
 import { BasicDetailsComponent } from './basic-details/basic-details.component';
@@ -25,7 +25,7 @@ export const routes: Routes = [
     },
     {
         path:'login/register',
-        component: LoginRegsisterComponent
+        component: LoginRegisterComponent
         // loadComponent: () => import('./login-regsister/login-regsister.component').then(m => m.LoginRegsisterComponent)
     },
     {

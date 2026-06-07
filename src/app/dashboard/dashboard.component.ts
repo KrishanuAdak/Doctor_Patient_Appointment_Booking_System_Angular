@@ -37,8 +37,8 @@ export class DashboardComponent {
   username: string | null = null;
   userRole: string | null = null;
   constructor(private authService: AuthService) {
-      this.username = this.authService.getUsername();
-      this.userRole = this.authService.extractUserRole();
+      //this.username = this.authService.getUsername();
+     // this.userRole = this.authService.extractUserRole();
       console.log('username',this.username);
       console.log('userRole',this.userRole);
   }

@@ -2,91 +2,98 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AuthDB } from '../models/AuthDB';
 import { Observable } from 'rxjs';
-import {jwtDecode} from 'jwt-decode';
 import { environment } from '../../environments/environment.prod';
-// import { environment } from  'src/environments/environment.prod.ts';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  register // Assuming roles are stored in 'roles' claim as an array
-    (role: string, username: any, password: any) {
-      throw new Error('Method not implemented.');
-  }
-    private apiBaseUrl = environment.apiBaseUrl;
 
-  constructor(private http:HttpClient) {
+  private apiBaseUrl = environment.apiBaseUrl;
 
-    this.http=http;
-  }
-  private auth_register_url= `${this.apiBaseUrl}/auth-service/register`;
+  private auth_register_url = `${this.apiBaseUrl}/auth-service/register`;
+  private auth_login_url    = `${this.apiBaseUrl}/auth-service/login`;
+  private auth_logout_url   = `${this.apiBaseUrl}/auth-service/logout`;
+  private chat_api_url      = `${this.apiBaseUrl}/ai/ask`;
 
-  private auth_login_url= `${this.apiBaseUrl}/auth-service/login`;
-  private chat_api_url = `${this.apiBaseUrl}/ai/ask`;
+  constructor(private http: HttpClient) {}
 
-  registerUser(data:AuthDB):Observable<any>
-  { 
-    return this.http.post<any>(this.auth_register_url,data);
-    
-
-  }
-  getCountsofCompletedAppointments():Observable<number>{
-    return this.http.get<number>('http://api.appointment-easy-bengal.in:5959/appointment/v1/appointments/count');
-
-  }
-  getCountsOfVerifiedDoctors():Observable<number>{
-    return this.http.get<number>('http://api.appointment-easy-bengal.in:8085/doctor/verified-doctor/counts');
+  // ─────────────────────────────────────────
+  // REGISTER
+  // Spring Boot sets HttpOnly cookie in response
+  // ─────────────────────────────────────────
+  registerUser(data: AuthDB): Observable<any> {
+    return this.http.post<any>(this.auth_register_url, data, {
+      withCredentials: true  // ← receives HttpOnly cookie from Spring Boot
+    });
   }
 
-  loginUser(data: AuthDB):Observable<any>{
-    return this.http.post<any>(this.auth_login_url, data);
+  // ─────────────────────────────────────────
+  // LOGIN
+  // Spring Boot validates and sets HttpOnly cookie
+  // ─────────────────────────────────────────
+  loginUser(data: AuthDB): Observable<any> {
+    return this.http.post<any>(this.auth_login_url, data, {
+      withCredentials: true  // ← receives HttpOnly cookie from Spring Boot
+    });
   }
 
-    logout() {
-    localStorage.removeItem('token');
-  }
-   getToken(): string | null {
-    return localStorage.getItem('token');
-  }
-
-   isLoggedIn(): boolean {
-    return !!localStorage.getItem('token');
-  }
-
-    getUsername(): string | null {
-    const token = this.getToken();
-    if (!token) return null;
-
-    try {
-      const decoded: any = jwtDecode(token as string);
-      // Spring Boot usually puts username/email in `sub`
-      return decoded?.sub || decoded?.username || null;
-    } catch (error) {
-      console.error('Invalid token:', error);
-      return null;
-    }
+  // ─────────────────────────────────────────
+  // LOGOUT
+  // Calls Spring Boot to clear the HttpOnly cookie
+  // Never manually clear localStorage — cookie is managed by server
+  // ─────────────────────────────────────────
+  logout(): Observable<any> {
+    return this.http.post<any>(this.auth_logout_url, {}, {
+      withCredentials: true  // ← server clears the cookie
+    });
   }
 
-  extractUserRole():string | null{
-    const token = this.getToken();
-    if(!token) return null;
-      const decoded: any = jwtDecode(token as string);
-      // Assuming roles are stored in 'roles' claim as an array
-      const roles = decoded?.roles;
-          return decoded?.role || decoded?.roles || null; // backend may use 'role' or 'roles'
-
-      
+  // ─────────────────────────────────────────
+  // AUTH STATE
+  // Since JWT is in HttpOnly cookie, we can't
+  // read it in JS — call a protected endpoint to verify
+  // ─────────────────────────────────────────
+  isLoggedIn(): Observable<boolean> {
+    return this.http.get<boolean>(`${this.apiBaseUrl}/auth-service/validate`, {
+      withCredentials: true  // ← sends cookie automatically
+    });
   }
-  sendMessage(message: string) {
-  const params = new HttpParams().set('query', message);
-  return this.http.get(this.chat_api_url, { 
-    params,
-    responseType: 'text'  // ← ADD THIS
-  });
-}
 
+  // ─────────────────────────────────────────
+  // GET CURRENT USER PROFILE
+  // Spring Boot reads JWT from cookie and returns user info
+  // ─────────────────────────────────────────
+  getProfile(): Observable<any> {
+    return this.http.get<any>(`${this.apiBaseUrl}/auth-service/profile`, {
+      withCredentials: true
+    });
+  }
 
-  
+  // ─────────────────────────────────────────
+  // DASHBOARD COUNTS (no auth needed)
+  // ─────────────────────────────────────────
+  getCountsofCompletedAppointments(): Observable<number> {
+    return this.http.get<number>(
+      'http://api.appointment-easy-bengal.in:5959/appointment/v1/appointments/count'
+    );
+  }
 
+  getCountsOfVerifiedDoctors(): Observable<number> {
+    return this.http.get<number>(
+      'http://api.appointment-easy-bengal.in:8085/doctor/verified-doctor/counts'
+    );
+  }
+
+  // ─────────────────────────────────────────
+  // AI CHAT
+  // ─────────────────────────────────────────
+  sendMessage(message: string): Observable<string> {
+    const params = new HttpParams().set('query', message);
+    return this.http.get(this.chat_api_url, {
+      params,
+      responseType: 'text',
+      withCredentials: true  // ← sends cookie if chat is protected
+    });
+  }
 }

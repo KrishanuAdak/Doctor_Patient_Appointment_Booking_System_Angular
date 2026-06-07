@@ -1,72 +1,155 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { trigger, transition, style, animate } from '@angular/animations';
-import { NavbarComponent } from '../navbar/navbar.component';
-import { AuthService } from '../springboot-api-services/auth.service';
-import { HttpClientModule } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthDB } from '../models/AuthDB';
+import { trigger, transition, style, animate } from '@angular/animations';
+import { AuthService } from '../springboot-api-services/auth.service'; // adjust path if needed
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+
 
 @Component({
-  selector: 'app-login-regsister',
-  standalone: true,
-  imports: [CommonModule, FormsModule, NavbarComponent, HttpClientModule],
+  selector: 'app-auth',
+  standalone:true,
+  imports: [FormsModule, CommonModule],
   templateUrl: './login-regsister.component.html',
-  styleUrls: ['./login-regsister.component.css'],
+  styleUrls: ['./login-regsister.component.scss'],
   animations: [
-    trigger('fadeSlide', [
+    trigger('slideDown', [
       transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(-20px)' }),
-        animate('400ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+        style({ maxHeight: '0', opacity: 0 }),
+        animate('350ms ease', style({ maxHeight: '200px', opacity: 1 }))
       ]),
       transition(':leave', [
-        animate('300ms ease-in', style({ opacity: 0, transform: 'translateY(20px)' }))
+        animate('300ms ease', style({ maxHeight: '0', opacity: 0 }))
       ])
     ])
-  ],
-  providers: [AuthService] // <-- Add this line
+  ]
 })
-export class LoginRegsisterComponent {
-password: any;
-  constructor(private authService: AuthService, private router: Router) {}
+export class LoginRegisterComponent implements OnInit {
 
-  isLogin = true;
-  role: 'patient' | 'doctor' = 'patient';
-  UserDetails: AuthDB = {
+  isLogin: boolean = true;
+  role: string = 'patient';
+  showPassword: boolean = false;
+  submitSuccess: boolean = false;
+  isLoading: boolean = false;
+  errorMessage: string = '';
+
+  userDetails = {
+    name: '',
     email: '',
     password: '',
-    role: this.role
+    phone: ''
   };
 
-  toggleMode() {
-    this.isLogin = !this.isLogin;
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {}
+
+  setRole(r: string): void {
+    this.role = r;
+    this.errorMessage = '';
   }
 
-  setRole(r: 'patient' | 'doctor') {
-    this.role = r;
+  toggleMode(): void {
+    this.isLogin = !this.isLogin;
+    this.errorMessage = '';
+    this.resetForm();
   }
-  submitForm() {
-    if(this.isLogin){
-      this.authService.loginUser(this.UserDetails).subscribe({
-        next: (res) => {
-          console.log('Login successful:', res);
-        },
-        error: (err) => {
-          console.error('Login failed:', err);
-        }
-      });
+
+  togglePassword(): void {
+    this.showPassword = !this.showPassword;
+  }
+
+  loginWithGoogle(): void {
+    console.log('Google login clicked');
+    // TODO: hook up Google OAuth
+  }
+
+  submitForm(): void {
+    this.errorMessage = '';
+    if (this.isLogin) {
+      this.handleLogin();
     } else {
-      this.authService.registerUser(this.UserDetails).subscribe({
-        next: (res) => {
-          console.log('Registration successful:', res);
-        },
-        error: (err) => {
-          console.error('Registration failed:', err);
-        }
-      });
+      this.handleRegister();
     }
   }
-  
- 
+
+  private handleLogin(): void {
+    this.isLoading = true;
+
+    const payload = {
+      email: this.userDetails.email,
+      password: this.userDetails.password,
+      role: this.role
+    };
+
+    this.authService.loginUser(payload).subscribe({
+      next: (res) => {
+        // JWT is set as HttpOnly cookie by Spring Boot
+        // Angular never stores or reads the token
+        console.log('Login success:', res);
+        this.isLoading = false;
+        this.showSuccess();
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.errorMessage = err?.error?.message || 'Invalid email or password.';
+        console.error('Login error:', err);
+      }
+    });
+  }
+
+  private handleRegister(): void {
+    this.isLoading = true;
+
+    const payload = {
+      name: this.userDetails.name,
+      email: this.userDetails.email,
+      password: this.userDetails.password,
+      phone: this.userDetails.phone,
+      role: this.role
+    };
+
+    this.authService.registerUser(payload).subscribe({
+      next: (res) => {
+        // JWT cookie set automatically by Spring Boot
+        console.log('Register success:', res);
+        this.isLoading = false;
+        this.showSuccess();
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.errorMessage = err?.error?.message || 'Registration failed. Please try again.';
+        console.error('Register error:', err);
+      }
+    });
+  }
+
+  private showSuccess(): void {
+    this.submitSuccess = true;
+    setTimeout(() => {
+      this.submitSuccess = false;
+      // Cookie already in browser — just navigate
+      this.router.navigate(['/dashboard']);
+      //   this.router.navigate(['/dashboard']);
+      // } else {
+      //   this.router.navigate(['/patient/dashboard']);
+      // }
+    }, 1500);
+  }
+
+  private resetForm(): void {
+    this.userDetails = {
+      name: '',
+      email: '',
+      password: '',
+      phone: ''
+    };
+    this.showPassword = false;
+    this.submitSuccess = false;
+    this.isLoading = false;
+    this.errorMessage = '';
+  }
 }

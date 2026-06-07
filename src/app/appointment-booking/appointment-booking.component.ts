@@ -47,8 +47,8 @@ export class AppointmentBookingComponent implements OnInit {
   }
 
   ngOnInit(): void {
-      this.username = this.authService.getUsername();
-      this.userRole = this.authService.extractUserRole();
+     // this.username = this.authService.getUsername();
+     // this.userRole = this.authService.extractUserRole();
       console.log('username',this.username);
       console.log('userRole',this.userRole);
 

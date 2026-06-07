@@ -1,0 +1,224 @@
+// auth.component.scss
+
+:host {
+  display: block;
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  background: #f0f6ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+// Import Google Font in styles.scss:
+// @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+$mint: #0fba81;
+$mint-d: #0a8f62;
+$mint-l: #e1f8f0;
+$navy: #0d1f3c;
+$slate: #4a6080;
+$mist: #f0f6ff;
+$danger: #e24b4a;
+$text: #0d1f3c;
+$text-m: #4a6080;
+$border: rgba(13, 31, 60, 0.12);
+
+.auth-wrap {
+  display: flex;
+  width: 100%;
+  max-width: 920px;
+  min-height: 600px;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 32px 80px rgba(13, 31, 60, 0.18);
+}
+
+/* ── LEFT ── */
+.auth-left {
+  flex: 1.1;
+  background: $navy;
+  padding: 52px 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(15,186,129,0.18) 0%, transparent 70%);
+    top: -80px; right: -80px;
+  }
+  &::after {
+    content: '';
+    position: absolute;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(15,186,129,0.12) 0%, transparent 70%);
+    bottom: 40px; left: -60px;
+  }
+}
+
+.pulse-rings {
+  position: absolute;
+  right: 44px; top: 50%;
+  transform: translateY(-50%);
+  z-index: 1; opacity: 0.25;
+}
+.ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid $mint;
+  transform: translate(-50%, -50%);
+  animation: pulse 3s ease-out infinite;
+  &:nth-child(1) { width: 80px;  height: 80px;  animation-delay: 0s; }
+  &:nth-child(2) { width: 140px; height: 140px; animation-delay: 0.8s; }
+  &:nth-child(3) { width: 200px; height: 200px; animation-delay: 1.6s; }
+}
+@keyframes pulse {
+  0%   { opacity: 0.6; transform: translate(-50%,-50%) scale(0.8); }
+  100% { opacity: 0;   transform: translate(-50%,-50%) scale(1.2); }
+}
+
+.brand { position: relative; z-index: 2; }
+.logo-mark { display: flex; align-items: center; gap: 12px; margin-bottom: 36px; }
+.logo-icon {
+  width: 48px; height: 48px; border-radius: 14px;
+  background: linear-gradient(135deg, $mint, #00c9a7);
+  display: flex; align-items: center; justify-content: center;
+  svg { width: 26px; height: 26px; }
+}
+.brand-name { font-family: 'DM Serif Display', serif; font-size: 28px; color: #fff; letter-spacing: -0.5px; }
+.tagline { font-size: 13px; color: rgba(255,255,255,0.5); letter-spacing: 1.5px; text-transform: uppercase; }
+
+.hero-text {
+  position: relative; z-index: 2;
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 36px; color: #fff; line-height: 1.25;
+    margin-bottom: 16px; letter-spacing: -0.5px;
+    em { color: $mint; font-style: normal; }
+  }
+  p { font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.7; max-width: 280px; }
+}
+
+.features { position: relative; z-index: 2; display: flex; flex-direction: column; gap: 12px; }
+.feat {
+  display: flex; align-items: center; gap: 12px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 12px 16px;
+  animation: slideIn 0.6s ease both;
+  &:nth-child(1) { animation-delay: 0.1s; }
+  &:nth-child(2) { animation-delay: 0.2s; }
+  &:nth-child(3) { animation-delay: 0.3s; }
+}
+.feat-dot { width: 8px; height: 8px; border-radius: 50%; background: $mint; flex-shrink: 0; }
+.feat span { font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 300; }
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── RIGHT ── */
+.auth-right {
+  flex: 1;
+  background: #fff;
+  padding: 48px 44px;
+  display: flex; flex-direction: column; justify-content: center;
+}
+
+.role-toggle {
+  display: flex; background: $mist; border-radius: 12px;
+  padding: 4px; margin-bottom: 32px; border: 1px solid $border;
+}
+.role-btn {
+  flex: 1; padding: 10px; border: none; background: transparent;
+  border-radius: 9px; font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 500; color: $text-m;
+  cursor: pointer; transition: all 0.25s ease;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  svg { width: 16px; height: 16px; }
+  &.active { background: $navy; color: #fff; box-shadow: 0 4px 16px rgba(13,31,60,0.2); }
+}
+
+.form-header { margin-bottom: 28px; }
+.mode-label { font-size: 12px; font-weight: 600; letter-spacing: 1.8px; text-transform: uppercase; color: $mint-d; margin-bottom: 8px; }
+.form-title { font-family: 'DM Serif Display', serif; font-size: 28px; color: $text; letter-spacing: -0.5px; }
+.form-sub { font-size: 14px; color: $text-m; margin-top: 4px; }
+
+.slide-form { animation: fadeUp 0.4s ease both; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.field { margin-bottom: 16px; position: relative; }
+.field label { display: block; font-size: 12px; font-weight: 600; color: $slate; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 6px; }
+.field-wrap { position: relative; }
+.field-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: $slate; svg { width: 17px; height: 17px; } }
+.field input {
+  width: 100%; padding: 12px 14px 12px 42px;
+  border: 1.5px solid $border; border-radius: 10px;
+  font-family: 'DM Sans', sans-serif; font-size: 14px;
+  color: $text; background: #fafcff;
+  transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+  &:focus { border-color: $mint; box-shadow: 0 0 0 4px rgba(15,186,129,0.12); background: #fff; }
+  &::placeholder { color: rgba(74,96,128,0.45); }
+}
+.err { font-size: 11.5px; color: $danger; margin-top: 4px; }
+.pw-toggle {
+  position: absolute; right: 13px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer; color: $slate; padding: 2px;
+  svg { width: 17px; height: 17px; }
+}
+
+.submit-btn {
+  width: 100%; padding: 14px;
+  background: linear-gradient(135deg, $mint 0%, #00c9a7 100%);
+  color: #fff; border: none; border-radius: 12px;
+  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600;
+  cursor: pointer; margin-top: 8px;
+  transition: transform 0.15s, box-shadow 0.2s;
+  position: relative; overflow: hidden; letter-spacing: 0.2px;
+  &::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+    transform: translateX(-100%);
+  }
+  &:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(15,186,129,0.4); &::after { animation: shimmer 0.7s ease both; } }
+  &:active { transform: translateY(0); }
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
+  &.success { background: linear-gradient(135deg, #0a8f62, #059669); }
+}
+@keyframes shimmer { to { transform: translateX(100%); } }
+
+.divider { display: flex; align-items: center; gap: 12px; margin: 20px 0 18px; span { font-size: 12px; color: $slate; white-space: nowrap; font-weight: 500; } &::before, &::after { content: ''; flex: 1; height: 1px; background: $border; } }
+
+.social-btn {
+  width: 100%; padding: 11px; border: 1.5px solid $border;
+  border-radius: 10px; background: #fff;
+  font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 500;
+  color: $text-m; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; gap: 10px;
+  transition: border-color 0.2s, background 0.2s;
+  &:hover { border-color: rgba(13,31,60,0.25); background: $mist; }
+}
+
+.toggle-row {
+  text-align: center; margin-top: 20px; font-size: 13.5px; color: $text-m;
+  a { color: $mint-d; font-weight: 600; cursor: pointer; border-bottom: 1.5px solid $mint-l; transition: color 0.2s, border-color 0.2s; &:hover { color: $navy; border-color: $navy; } }
+}
+
+@media (max-width: 640px) {
+  .auth-wrap { flex-direction: column; }
+  .auth-left { padding: 36px 28px; flex: none; }
+  .hero-text h2 { font-size: 26px; }
+  .pulse-rings { display: none; }
+  .auth-right { padding: 36px 28px; }
+}
