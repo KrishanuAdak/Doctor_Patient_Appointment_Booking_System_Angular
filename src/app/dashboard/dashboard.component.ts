@@ -7,7 +7,7 @@ import { AuthService } from '../springboot-api-services/auth.service'; // Adjust
 // Or, if it's in 'src/app/services/auth.service.ts':
 // import { AuthService } from '../services/auth.service';
 import jwtDecode from 'jwt-decode';
-import { RouterLink } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
 import { DashboardNavbarComponent } from "../dashboard-navbar/dashboard-navbar.component";
 import { Doctor } from '../models/Doctor';
 
@@ -39,7 +39,7 @@ export class DashboardComponent {
   username: string | null = null;
   userRole: string | null = null;
   doctors: Doctor[] = [];
-  constructor(private authService: AuthService) {
+  constructor(private authService: AuthService,private route:Router) {
       //this.username = this.authService.getUsername();
      // this.userRole = this.authService.extractUserRole();
       console.log('username',this.username);
@@ -50,7 +50,8 @@ export class DashboardComponent {
 
    logout(){
     this.authService.logout();
-    window.location.reload(); // Reload the page to reflect the logout
+    this.route.navigate(['/login']);
+    window.location.reload(); // Redirect to login after logout
 
    }
 }
