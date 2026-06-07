@@ -75,13 +75,13 @@ export class AuthService {
   // ─────────────────────────────────────────
   getCountsofCompletedAppointments(): Observable<number> {
     return this.http.get<number>(
-      'http://api.appointment-easy-bengal.in:5959/appointment/v1/appointments/count'
+      `${this.apiBaseUrl}/appointment/v1/appointments/count`
     );
   }
 
   getCountsOfVerifiedDoctors(): Observable<number> {
     return this.http.get<number>(
-      'http://api.appointment-easy-bengal.in:8085/doctor/verified-doctor/counts'
+      `${this.apiBaseUrl}/doctor/verified-doctor/counts`
     );
   }
 

@@ -51,7 +51,6 @@ export class DashboardComponent {
    logout(){
     this.authService.logout();
     this.route.navigate(['/login']);
-    window.location.reload(); // Redirect to login after logout
 
    }
 }
