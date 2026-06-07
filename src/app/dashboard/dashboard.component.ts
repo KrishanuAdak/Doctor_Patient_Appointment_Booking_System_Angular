@@ -50,7 +50,7 @@ export class DashboardComponent {
 
    logout(){
     this.authService.logout();
-    this.route.navigate(['/login']);
+    this.route.navigate(['/login/register']);
 
    }
 }
