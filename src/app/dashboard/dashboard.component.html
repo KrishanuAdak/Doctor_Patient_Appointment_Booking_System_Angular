@@ -1,139 +1,1212 @@
-<div class="container-fluid px-0">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-  <!-- NAVBAR -->
-  <nav class="navbar navbar-expand-lg bg-white shadow-sm sticky-top px-4">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <a class="navbar-brand fw-bold fs-4 text-primary" routerLink="/dashboard">
-      🏥 Doctor-Patient Portal
-    </a>
+  :root {
+    --primary: #0f766e;
+    --primary-light: #14b8a6;
+    --primary-dark: #0d5c55;
+    --accent: #f0fdf4;
+    --surface: #ffffff;
+    --surface2: #f8fffe;
+    --border: #e2f0ef;
+    --text: #0f2d2b;
+    --text-secondary: #4a6e6b;
+    --text-muted: #94aaa8;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --success: #10b981;
+    --info: #0ea5e9;
+    --sidebar-w: 260px;
+    --radius: 16px;
+    --shadow: 0 4px 24px rgba(15,118,110,0.08);
+    --shadow-lg: 0 8px 40px rgba(15,118,110,0.14);
+  }
 
-    <ul class="navbar-nav ms-auto align-items-center gap-3">
+  body { font-family: 'DM Sans', sans-serif; background: #f0faf9; color: var(--text); }
 
-      <li class="nav-item">
-        <a routerLink="/accounts" class="nav-link">Accounts</a>
-      </li>
+  .app-shell { display: flex; min-height: 100vh; position: relative; }
 
-      <li class="nav-item">
-        <a routerLink="/appointments" class="nav-link">Appointments</a>
-      </li>
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: linear-gradient(180deg, #0a3f3b 0%, #0f5c55 50%, #125e57 100%);
+    display: flex; flex-direction: column;
+    position: fixed; top: 0; left: 0; height: 100vh;
+    z-index: 100; transition: transform .3s cubic-bezier(.4,0,.2,1);
+    overflow: hidden;
+  }
+  .sidebar::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at top right, rgba(20,184,166,.15) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .sidebar-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.4); z-index: 99;
+  }
+  .sidebar-logo {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+  .logo-mark {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .logo-icon {
+    width: 40px; height: 40px; background: var(--primary-light);
+    border-radius: 12px; display: flex; align-items: center;
+    justify-content: center; font-size: 20px;
+  }
+  .logo-text { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 700; color: #fff; }
+  .logo-sub { font-size: 11px; color: rgba(255,255,255,.5); margin-top: 1px; letter-spacing: .5px; }
 
-      <li class="nav-item">
-        <a routerLink="/contact-us" class="nav-link">Contact Us</a>
-      </li>
+  .role-toggle {
+    margin: 20px 16px;
+    background: rgba(255,255,255,.06);
+    border-radius: 12px;
+    padding: 4px;
+    display: flex; gap: 0;
+  }
+  .role-btn {
+    flex: 1; padding: 8px 4px; text-align: center;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    border-radius: 9px; border: none; transition: all .2s;
+    color: rgba(255,255,255,.55); background: transparent;
+    font-family: 'DM Sans', sans-serif; letter-spacing: .3px;
+  }
+  .role-btn.active { background: var(--primary-light); color: #fff; box-shadow: 0 2px 8px rgba(20,184,166,.4); }
 
-      <li class="nav-item"
-          *ngIf="userRole?.toLowerCase()=='doctor'">
-        <a routerLink="/available" class="nav-link">
-          Doctor Options
-        </a>
-      </li>
+  .sidebar-nav { flex: 1; padding: 8px 12px; overflow-y: auto; }
+  .nav-section-label {
+    font-size: 10px; font-weight: 700; color: rgba(255,255,255,.3);
+    letter-spacing: 1.2px; text-transform: uppercase;
+    padding: 16px 12px 8px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 14px; border-radius: 12px;
+    cursor: pointer; transition: all .2s; margin-bottom: 2px;
+    color: rgba(255,255,255,.65); font-size: 14px; font-weight: 500;
+    border: 1px solid transparent;
+  }
+  .nav-item:hover { background: rgba(255,255,255,.08); color: #fff; }
+  .nav-item.active {
+    background: rgba(20,184,166,.2); color: #fff;
+    border-color: rgba(20,184,166,.3);
+  }
+  .nav-item .nav-icon { font-size: 18px; width: 22px; text-align: center; flex-shrink: 0; }
+  .nav-badge {
+    margin-left: auto; background: #ef4444; color: #fff;
+    font-size: 10px; font-weight: 700; padding: 2px 7px;
+    border-radius: 20px; min-width: 20px; text-align: center;
+  }
 
-      <li>
-        <button class="btn btn-outline-danger rounded-pill"
-                (click)="logout()">
-          Logout
+  .sidebar-footer {
+    padding: 16px; border-top: 1px solid rgba(255,255,255,.08);
+  }
+  .user-card {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px; border-radius: 12px;
+    background: rgba(255,255,255,.06);
+  }
+  .user-avatar {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: var(--primary-light); display: flex;
+    align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px; color: #fff; flex-shrink: 0;
+  }
+  .user-name { font-size: 13px; font-weight: 600; color: #fff; }
+  .user-role { font-size: 11px; color: rgba(255,255,255,.45); margin-top: 1px; }
+
+  /* ── MAIN CONTENT ── */
+  .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(240,250,249,.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    height: 68px; display: flex; align-items: center;
+    justify-content: space-between; gap: 16px;
+  }
+  .topbar-left { display: flex; flex-direction: column; }
+  .topbar-title { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; color: var(--text); }
+  .topbar-sub { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .topbar-search {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 12px; padding: 8px 14px;
+    width: 220px; transition: border-color .2s;
+  }
+  .topbar-search:focus-within { border-color: var(--primary-light); }
+  .topbar-search input {
+    border: none; outline: none; background: transparent;
+    font-size: 13px; color: var(--text); width: 100%;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .topbar-search input::placeholder { color: var(--text-muted); }
+  .icon-btn {
+    width: 40px; height: 40px; border-radius: 11px;
+    border: 1.5px solid var(--border); background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 18px; position: relative;
+    transition: all .2s;
+  }
+  .icon-btn:hover { border-color: var(--primary-light); background: var(--accent); }
+  .notif-dot {
+    position: absolute; top: 7px; right: 7px;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #ef4444; border: 1.5px solid #f0faf9;
+  }
+  .hamburger { display: none; }
+
+  /* ── PAGE CONTENT ── */
+  .page { padding: 28px 32px; animation: fadeInUp .4s ease; }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── SECTION HEADERS ── */
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .section-title { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 700; color: var(--text); }
+  .section-sub { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+  .view-all { font-size: 13px; font-weight: 600; color: var(--primary); cursor: pointer; border: none; background: none; padding: 6px 12px; border-radius: 8px; transition: background .2s; }
+  .view-all:hover { background: var(--accent); }
+
+  /* ── STAT CARDS ── */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+  .stat-card {
+    background: var(--surface); border-radius: var(--radius);
+    padding: 22px 24px; border: 1.5px solid var(--border);
+    box-shadow: var(--shadow); position: relative; overflow: hidden;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+  .stat-card::after {
+    content: ''; position: absolute; right: -20px; top: -20px;
+    width: 80px; height: 80px; border-radius: 50%;
+    opacity: .06;
+  }
+  .stat-card.teal::after { background: #0f766e; }
+  .stat-card.blue::after { background: #0ea5e9; }
+  .stat-card.amber::after { background: #f59e0b; }
+  .stat-card.green::after { background: #10b981; }
+  .stat-label { font-size: 12px; font-weight: 600; color: var(--text-muted); letter-spacing: .5px; text-transform: uppercase; }
+  .stat-value { font-family: 'Sora', sans-serif; font-size: 34px; font-weight: 800; margin: 8px 0 4px; line-height: 1; }
+  .stat-card.teal .stat-value { color: var(--primary); }
+  .stat-card.blue .stat-value { color: #0ea5e9; }
+  .stat-card.amber .stat-value { color: #f59e0b; }
+  .stat-card.green .stat-value { color: #10b981; }
+  .stat-change { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+  .stat-change.up { color: #10b981; }
+  .stat-icon {
+    position: absolute; right: 20px; top: 20px;
+    font-size: 28px; opacity: .18;
+  }
+
+  /* ── TWO-COL LAYOUT ── */
+  .two-col { display: grid; grid-template-columns: 1fr 340px; gap: 20px; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--surface); border-radius: var(--radius);
+    border: 1.5px solid var(--border); box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 18px 22px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .card-title { font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); }
+  .card-body { padding: 18px 22px; }
+
+  /* ── APPOINTMENT LIST ── */
+  .appt-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 0; border-bottom: 1px solid var(--border);
+    transition: background .15s; border-radius: 8px;
+    margin: 0 -4px; padding-left: 4px; padding-right: 4px;
+  }
+  .appt-item:last-child { border-bottom: none; }
+  .appt-item:hover { background: var(--surface2); }
+  .avatar {
+    width: 42px; height: 42px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px; color: #fff; flex-shrink: 0;
+  }
+  .appt-info { flex: 1; min-width: 0; }
+  .appt-name { font-weight: 600; font-size: 14px; color: var(--text); }
+  .appt-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .appt-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+  .appt-time { font-size: 13px; font-weight: 600; color: var(--text); }
+
+  /* ── STATUS BADGES ── */
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 700; letter-spacing: .3px;
+  }
+  .badge-upcoming { background: #e0f2fe; color: #0369a1; }
+  .badge-completed { background: #dcfce7; color: #166534; }
+  .badge-cancelled { background: #fee2e2; color: #991b1b; }
+  .badge-pending { background: #fef3c7; color: #92400e; }
+  .badge-video { background: #ede9fe; color: #6d28d9; }
+  .badge-inperson { background: #f0fdf4; color: #166534; }
+
+  /* ── DOCTOR CARDS GRID ── */
+  .doctors-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
+  .doctor-card {
+    background: var(--surface); border-radius: var(--radius);
+    border: 1.5px solid var(--border); box-shadow: var(--shadow);
+    padding: 22px; transition: all .25s; cursor: pointer;
+    position: relative; overflow: hidden;
+  }
+  .doctor-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--primary-light); }
+  .doctor-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 4px; border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .doc-top { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
+  .doc-avatar {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 16px; color: #fff; flex-shrink: 0;
+  }
+  .doc-name { font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); }
+  .doc-spec { font-size: 12px; color: var(--text-muted); margin-top: 2px; font-weight: 500; }
+  .doc-hospital { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+  .availability-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px;
+  }
+  .availability-dot.on { background: #10b981; box-shadow: 0 0 0 3px rgba(16,185,129,.2); }
+  .availability-dot.off { background: #d1d5db; }
+  .doc-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .doc-stat {
+    background: var(--surface2); border-radius: 10px; padding: 8px;
+    text-align: center; border: 1px solid var(--border);
+  }
+  .doc-stat-val { font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); }
+  .doc-stat-key { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+  .stars { display: flex; gap: 2px; font-size: 13px; }
+  .doc-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid var(--border); }
+  .doc-fee { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; color: var(--primary); }
+  .doc-fee-sub { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 7px; padding: 10px 20px; border-radius: 11px;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    border: none; transition: all .2s; font-family: 'DM Sans', sans-serif;
+    text-decoration: none;
+  }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-dark); box-shadow: 0 4px 14px rgba(15,118,110,.35); transform: translateY(-1px); }
+  .btn-primary:disabled { background: #a7c9c6; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-outline { background: transparent; color: var(--primary); border: 1.5px solid var(--border); }
+  .btn-outline:hover { border-color: var(--primary-light); background: var(--accent); }
+  .btn-sm { padding: 7px 14px; font-size: 12px; border-radius: 9px; }
+  .btn-danger { background: #fee2e2; color: #991b1b; }
+  .btn-danger:hover { background: #fecaca; }
+  .btn-success { background: #dcfce7; color: #166534; }
+  .btn-success:hover { background: #bbf7d0; }
+  .btn-full { width: 100%; }
+
+  /* ── FILTER BAR ── */
+  .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px; }
+  .filter-chip {
+    padding: 7px 16px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    cursor: pointer; border: 1.5px solid var(--border); background: var(--surface);
+    color: var(--text-secondary); transition: all .2s;
+  }
+  .filter-chip:hover { border-color: var(--primary-light); color: var(--primary); }
+  .filter-chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+  /* ── SEARCH BAR ── */
+  .search-bar {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 13px; padding: 10px 16px; margin-bottom: 18px;
+    transition: border-color .2s;
+  }
+  .search-bar:focus-within { border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(20,184,166,.1); }
+  .search-bar input {
+    flex: 1; border: none; outline: none; background: transparent;
+    font-size: 14px; color: var(--text); font-family: 'DM Sans', sans-serif;
+  }
+  .search-bar input::placeholder { color: var(--text-muted); }
+
+  /* ── BOOKING ── */
+  .booking-container { max-width: 720px; margin: 0 auto; }
+  .booking-steps { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 32px; }
+  .step-item { display: flex; align-items: center; gap: 0; }
+  .step-circle {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; border: 2px solid var(--border);
+    background: var(--surface); color: var(--text-muted);
+    transition: all .3s; position: relative; z-index: 1;
+  }
+  .step-circle.active { border-color: var(--primary); background: var(--primary); color: #fff; box-shadow: 0 0 0 4px rgba(15,118,110,.15); }
+  .step-circle.done { border-color: var(--primary-light); background: var(--primary-light); color: #fff; }
+  .step-label { font-size: 11px; font-weight: 600; color: var(--text-muted); position: absolute; bottom: -20px; white-space: nowrap; left: 50%; transform: translateX(-50%); }
+  .step-line { width: 80px; height: 2px; background: var(--border); position: relative; top: 0; }
+  .step-line.done { background: var(--primary-light); }
+
+  .booking-card {
+    background: var(--surface); border-radius: 20px;
+    border: 1.5px solid var(--border); box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+  .booking-card-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    padding: 28px 28px 24px; color: #fff;
+  }
+  .booking-card-body { padding: 28px; }
+  .selected-doc-card {
+    display: flex; gap: 16px; background: var(--surface2);
+    border: 1.5px solid var(--border); border-radius: 14px; padding: 16px;
+    margin-bottom: 24px;
+  }
+  .slots-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 24px; }
+  .slot-btn {
+    padding: 10px 8px; border-radius: 11px; text-align: center;
+    font-size: 12px; font-weight: 600; cursor: pointer; border: 1.5px solid var(--border);
+    background: var(--surface); color: var(--text); transition: all .2s;
+  }
+  .slot-btn:hover:not(.unavailable) { border-color: var(--primary-light); color: var(--primary); background: var(--accent); }
+  .slot-btn.selected { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 2px 8px rgba(15,118,110,.3); }
+  .slot-btn.unavailable { background: #f5f5f5; color: var(--text-muted); cursor: not-allowed; text-decoration: line-through; }
+
+  .date-input {
+    width: 100%; padding: 12px 16px; border-radius: 12px;
+    border: 1.5px solid var(--border); font-size: 14px;
+    font-family: 'DM Sans', sans-serif; color: var(--text);
+    background: var(--surface); outline: none; transition: border-color .2s;
+    margin-bottom: 20px;
+  }
+  .date-input:focus { border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(20,184,166,.1); }
+
+  .summary-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .summary-row:last-child { border-bottom: none; }
+  .summary-label { color: var(--text-muted); }
+  .summary-value { font-weight: 600; color: var(--text); }
+
+  /* ── SUCCESS STATE ── */
+  .success-state { text-align: center; padding: 48px 28px; }
+  .success-icon { font-size: 64px; margin-bottom: 16px; animation: popIn .5s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .success-title { font-family: 'Sora', sans-serif; font-size: 24px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+  .success-sub { color: var(--text-muted); font-size: 14px; margin-bottom: 28px; }
+
+  /* ── QUICK SCHEDULE (sidebar) ── */
+  .schedule-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+  }
+  .schedule-item:last-child { border-bottom: none; }
+  .schedule-time-block {
+    min-width: 56px; text-align: center;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 6px 4px;
+  }
+  .sch-time { font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 700; color: var(--text); }
+  .sch-period { font-size: 10px; color: var(--text-muted); }
+  .sch-patient { font-size: 13px; font-weight: 600; color: var(--text); }
+  .sch-detail { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  /* ── APPOINTMENTS PAGE ── */
+  .appts-table-header {
+    display: grid; grid-template-columns: 2fr 2fr 1.2fr 1.2fr 1fr 1fr;
+    gap: 12px; padding: 12px 18px; background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    font-size: 11px; font-weight: 700; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: .5px;
+  }
+  .appts-table-row {
+    display: grid; grid-template-columns: 2fr 2fr 1.2fr 1.2fr 1fr 1fr;
+    gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--border);
+    align-items: center; transition: background .15s; font-size: 14px;
+  }
+  .appts-table-row:last-child { border-bottom: none; }
+  .appts-table-row:hover { background: var(--surface2); }
+
+  /* ── DOCTOR DASH ── */
+  .doc-stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
+  .mini-stat {
+    background: var(--surface2); border: 1.5px solid var(--border);
+    border-radius: 14px; padding: 18px 16px;
+    text-align: center;
+  }
+  .mini-stat-val { font-family: 'Sora', sans-serif; font-size: 28px; font-weight: 800; color: var(--primary); }
+  .mini-stat-key { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+  .action-row { display: flex; gap: 8px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1100px) {
+    .two-col { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 900px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); }
+    .sidebar-overlay { display: block; }
+    .main { margin-left: 0; }
+    .hamburger { display: flex; }
+    .appts-table-header, .appts-table-row { grid-template-columns: 1.5fr 1.5fr 1fr 1fr; }
+    .appts-table-header > *:nth-child(5),
+    .appts-table-header > *:nth-child(6),
+    .appts-table-row > *:nth-child(5),
+    .appts-table-row > *:nth-child(6) { display: none; }
+    .slots-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .page { padding: 18px 16px; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .topbar { padding: 0 16px; }
+    .topbar-search { display: none; }
+    .slots-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+
+<!-- APP SHELL -->
+<div class="app-shell">
+
+  <!-- SIDEBAR OVERLAY (mobile) -->
+  <div class="sidebar-overlay" *ngIf="sidebarOpen" (click)="toggleSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" [class.open]="sidebarOpen">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <div class="logo-icon">🏥</div>
+        <div>
+          <div class="logo-text">MediCare</div>
+          <div class="logo-sub">Health Management System</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="role-toggle" style="margin:16px;">
+      <button class="role-btn" [class.active]="activeRole === 'patient'" (click)="switchRole('patient')">👤 Patient</button>
+      <button class="role-btn" [class.active]="activeRole === 'doctor'" (click)="switchRole('doctor')">🩺 Doctor</button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+
+      <div class="nav-item" [class.active]="activeView === 'home'" (click)="setView('home')">
+        <span class="nav-icon">🏠</span> Dashboard
+      </div>
+
+      <!-- Patient nav -->
+      <ng-container *ngIf="activeRole === 'patient'">
+        <div class="nav-item" [class.active]="activeView === 'book'" (click)="setView('doctors')">
+          <span class="nav-icon">📅</span> Book Appointment
+        </div>
+        <div class="nav-item" [class.active]="activeView === 'appointments'" (click)="setView('appointments')">
+          <span class="nav-icon">📋</span> My Appointments
+          <span class="nav-badge" *ngIf="upcomingCount > 0">{{upcomingCount}}</span>
+        </div>
+        <div class="nav-item" [class.active]="activeView === 'doctors'" (click)="setView('doctors')">
+          <span class="nav-icon">👨‍⚕️</span> Find Doctors
+        </div>
+      </ng-container>
+
+      <!-- Doctor nav -->
+      <ng-container *ngIf="activeRole === 'doctor'">
+        <div class="nav-item" [class.active]="activeView === 'appointments'" (click)="setView('appointments')">
+          <span class="nav-icon">📋</span> All Appointments
+          <span class="nav-badge" *ngIf="pendingCount > 0">{{pendingCount}}</span>
+        </div>
+        <div class="nav-item" [class.active]="activeView === 'patients'" (click)="setView('patients')">
+          <span class="nav-icon">🫀</span> My Patients
+        </div>
+        <div class="nav-item" [class.active]="activeView === 'schedule'" (click)="setView('schedule')">
+          <span class="nav-icon">🗓️</span> Schedule
+        </div>
+      </ng-container>
+
+      <div class="nav-section-label" style="margin-top: 8px;">General</div>
+      <div class="nav-item">
+        <span class="nav-icon">🔔</span> Notifications
+        <span class="nav-badge">{{notificationCount}}</span>
+      </div>
+      <div class="nav-item">
+        <span class="nav-icon">⚙️</span> Settings
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar" [style.background]="activeRole === 'doctor' ? '#0f766e' : '#0ea5e9'">
+          {{activeRole === 'doctor' ? 'AM' : 'RG'}}
+        </div>
+        <div>
+          <div class="user-name">{{activeRole === 'doctor' ? 'Dr. Arjun Mehta' : 'Rahul Gupta'}}</div>
+          <div class="user-role">{{activeRole === 'doctor' ? 'Cardiologist · ID #D001' : 'Patient · ID #P001'}}</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN AREA -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <button class="icon-btn hamburger" (click)="toggleSidebar()">☰</button>
+        <div class="topbar-left">
+          <div class="topbar-title">
+            <span *ngIf="activeView === 'home'">{{activeRole === 'doctor' ? 'Doctor Dashboard' : 'Patient Dashboard'}}</span>
+            <span *ngIf="activeView === 'appointments'">Appointments</span>
+            <span *ngIf="activeView === 'doctors'">Find Doctors</span>
+            <span *ngIf="activeView === 'book'">Book Appointment</span>
+            <span *ngIf="activeView === 'patients'">My Patients</span>
+            <span *ngIf="activeView === 'schedule'">My Schedule</span>
+          </div>
+          <div class="topbar-sub">{{today}}</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-search">
+          <span style="font-size:16px;color:#94aaa8;">🔍</span>
+          <input type="text" placeholder="Search patients, doctors..." [(ngModel)]="searchQuery">
+        </div>
+        <div class="icon-btn" title="Notifications">
+          🔔
+          <div class="notif-dot"></div>
+        </div>
+        <div class="user-avatar" style="width:38px;height:38px;border-radius:10px;flex-shrink:0;cursor:pointer;"
+          [style.background]="activeRole === 'doctor' ? '#0f766e' : '#0ea5e9'">
+          {{activeRole === 'doctor' ? 'AM' : 'RG'}}
+        </div>
+      </div>
+    </header>
+
+    <!-- ════════════════════════════════════════ -->
+    <!-- PATIENT HOME DASHBOARD -->
+    <!-- ════════════════════════════════════════ -->
+    <div class="page" *ngIf="activeView === 'home' && activeRole === 'patient'">
+
+      <!-- Welcome Banner -->
+      <div style="background:linear-gradient(135deg,#0f766e 0%,#14b8a6 60%,#06b6d4 100%);
+                  border-radius:20px;padding:28px 32px;margin-bottom:24px;
+                  position:relative;overflow:hidden;color:#fff;">
+        <div style="position:absolute;right:-30px;top:-30px;width:160px;height:160px;
+                    border-radius:50%;background:rgba(255,255,255,.07);"></div>
+        <div style="position:absolute;right:60px;bottom:-40px;width:100px;height:100px;
+                    border-radius:50%;background:rgba(255,255,255,.05);"></div>
+        <div style="font-size:13px;opacity:.75;margin-bottom:6px;font-weight:500;">Good morning,</div>
+        <div style="font-family:'Sora',sans-serif;font-size:26px;font-weight:800;margin-bottom:8px;">Rahul Gupta 👋</div>
+        <div style="opacity:.8;font-size:14px;max-width:340px;">You have <strong>{{upcomingCount}} upcoming appointments</strong> and <strong>{{pendingCount}} pending confirmations</strong> this week.</div>
+        <button class="btn btn-primary" style="margin-top:18px;background:rgba(255,255,255,.2);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.3);" (click)="setView('doctors')">
+          📅 Book New Appointment
         </button>
-      </li>
+      </div>
 
-    </ul>
-  </nav>
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card teal">
+          <div class="stat-label">Upcoming</div>
+          <div class="stat-value">{{upcomingCount}}</div>
+          <div class="stat-change up">▲ Appointments ahead</div>
+          <div class="stat-icon">📅</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-label">Completed</div>
+          <div class="stat-value">{{completedCount}}</div>
+          <div class="stat-change">Sessions done</div>
+          <div class="stat-icon">✅</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-label">Pending</div>
+          <div class="stat-value">{{pendingCount}}</div>
+          <div class="stat-change">Awaiting confirmation</div>
+          <div class="stat-icon">⏳</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Doctors Available</div>
+          <div class="stat-value">{{availableDoctorsCount}}</div>
+          <div class="stat-change up">▲ Ready to consult</div>
+          <div class="stat-icon">🩺</div>
+        </div>
+      </div>
 
+      <!-- Two-col content -->
+      <div class="two-col">
 
-  <!-- HERO -->
-  <div class="hero-section p-5">
-
-    <div class="text-center mb-5">
-      <h1 class="fw-bold">
-        Book Appointments with Trusted Doctors
-      </h1>
-
-      <p class="text-muted">
-        Search doctors and book appointments instantly.
-      </p>
-    </div>
-
-
-    <!-- SEARCH BAR -->
-    <div class="card shadow-lg border-0 rounded-5 p-4">
-
-      <div class="row g-3">
-
-        <div class="col-md-4">
-          <input class="form-control rounded-pill"
-                 placeholder="Search Doctor">
+        <!-- Upcoming appointments -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Upcoming Appointments</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Your scheduled visits</div>
+            </div>
+            <button class="view-all" (click)="setView('appointments')">View all →</button>
+          </div>
+          <div class="card-body" style="padding-top:8px;padding-bottom:8px;">
+            <div class="appt-item" *ngFor="let a of todayAppointments">
+              <div class="avatar" [style.background]="a.avatarColor">{{a.patientInitials}}</div>
+              <div class="appt-info">
+                <div class="appt-name">{{a.doctorName}}</div>
+                <div class="appt-meta">{{a.specialty}} · {{a.date}}</div>
+              </div>
+              <div class="appt-right">
+                <div class="appt-time">{{a.time}}</div>
+                <span class="badge" [class]="'badge-' + a.status">{{a.status | titlecase}}</span>
+              </div>
+            </div>
+            <div *ngIf="todayAppointments.length === 0"
+              style="text-align:center;padding:32px;color:var(--text-muted);font-size:14px;">
+              No upcoming appointments
+            </div>
+          </div>
         </div>
 
-        <div class="col-md-3">
-          <select class="form-select rounded-pill">
-
-            <option>Select Location</option>
-            <option>Kolkata</option>
-            <option>Bangalore</option>
-            <option>Delhi</option>
-
-          </select>
-        </div>
-
-        <div class="col-md-3">
-          <select class="form-select rounded-pill">
-
-            <option>Speciality</option>
-            <option>Cardiology</option>
-            <option>Neurology</option>
-            <option>Orthopedic</option>
-
-          </select>
-        </div>
-
-        <div class="col-md-2">
-          <button class="btn btn-primary rounded-pill w-100">
-            Search
-          </button>
+        <!-- Available doctors quick view -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Available Now</div>
+            <button class="view-all" (click)="setView('doctors')">See all →</button>
+          </div>
+          <div class="card-body" style="padding-top:8px;padding-bottom:8px;">
+            <div class="schedule-item" *ngFor="let d of doctors | slice:0:4">
+              <div class="doc-avatar" style="width:42px;height:42px;border-radius:12px;font-size:13px;"
+                [style.background]="d.color">{{d.initials}}</div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:13px;font-weight:600;color:var(--text);">{{d.name}}</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">{{d.specialty}} · ₹{{d.fee}}</div>
+                <div style="font-size:11px;margin-top:4px;"
+                  [style.color]="d.available ? '#10b981' : '#94aaa8'">
+                  {{d.available ? '🟢 Next: ' + d.nextSlot : '⚪ ' + d.nextSlot}}
+                </div>
+              </div>
+              <button class="btn btn-primary btn-sm" (click)="openBooking(d)" [disabled]="!d.available">Book</button>
+            </div>
+          </div>
         </div>
 
       </div>
-
     </div>
 
-  </div>
+    <!-- ════════════════════════════════════════ -->
+    <!-- DOCTOR HOME DASHBOARD -->
+    <!-- ════════════════════════════════════════ -->
+    <div class="page" *ngIf="activeView === 'home' && activeRole === 'doctor'">
 
-
-  <!-- AVAILABLE DOCTORS -->
-  <div class="container mt-5">
-
-    <h3 class="fw-bold mb-4">
-      Available Doctors
-    </h3>
-
-    <div class="row">
-
-      <div class="col-md-3 mb-4"
-           *ngFor="let doctor of doctors">
-
-        <div class="card border-0 shadow rounded-4 p-3">
-
-          <img [src]="doctor.imageUrl"
-               class="rounded-circle mx-auto"
-               width="100">
-
-          <h5 class="mt-3 text-center">
-            {{doctor.name}}
-          </h5>
-
-          <p class="text-muted text-center">
-            {{doctor.specialization}}
-          </p>
-
-          <button class="btn btn-primary rounded-pill">
-            Book Appointment
-          </button>
-
-        </div>
-
+      <div style="background:linear-gradient(135deg,#0a3f3b 0%,#0f766e 60%,#14b8a6 100%);
+                  border-radius:20px;padding:28px 32px;margin-bottom:24px;
+                  position:relative;overflow:hidden;color:#fff;">
+        <div style="position:absolute;right:-20px;top:-20px;width:160px;height:160px;
+                    border-radius:50%;background:rgba(255,255,255,.06);"></div>
+        <div style="font-size:13px;opacity:.7;margin-bottom:6px;">Welcome back,</div>
+        <div style="font-family:'Sora',sans-serif;font-size:26px;font-weight:800;margin-bottom:8px;">Dr. Arjun Mehta 🩺</div>
+        <div style="opacity:.8;font-size:14px;">You have <strong>{{doctorTodayAppointments.length}} appointments today</strong>. Your next patient is at <strong>10:00 AM</strong>.</div>
       </div>
 
+      <div class="doc-stats-row">
+        <div class="mini-stat">
+          <div class="mini-stat-val">{{doctorTodayAppointments.length}}</div>
+          <div class="mini-stat-key">Today's Patients</div>
+        </div>
+        <div class="mini-stat" style="border-color:#dcfce7;">
+          <div class="mini-stat-val" style="color:#10b981;">{{completedCount}}</div>
+          <div class="mini-stat-key">Completed</div>
+        </div>
+        <div class="mini-stat" style="border-color:#fef3c7;">
+          <div class="mini-stat-val" style="color:#f59e0b;">{{pendingCount}}</div>
+          <div class="mini-stat-key">Pending Review</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Today's Appointments</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Manage your patient queue</div>
+            </div>
+            <button class="view-all" (click)="setView('appointments')">View all →</button>
+          </div>
+          <div class="card-body" style="padding-top:8px;padding-bottom:8px;">
+            <div class="appt-item" *ngFor="let a of doctorTodayAppointments">
+              <div class="avatar" [style.background]="a.avatarColor">{{a.patientInitials}}</div>
+              <div class="appt-info">
+                <div class="appt-name">{{a.patientName}}</div>
+                <div class="appt-meta">Age {{a.age}} · {{a.specialty}}</div>
+              </div>
+              <div class="appt-right">
+                <div class="appt-time">{{a.time}}</div>
+                <span class="badge" [class]="'badge-' + a.status">{{a.status | titlecase}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Quick Actions</div>
+          </div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <button class="btn btn-primary btn-full" (click)="setView('appointments')">📋 View All Appointments</button>
+              <button class="btn btn-outline btn-full" (click)="setView('schedule')">🗓️ Manage Schedule</button>
+              <button class="btn btn-outline btn-full" (click)="setView('patients')">🫀 View My Patients</button>
+            </div>
+
+            <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border);">
+              <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px;">Today's Stats</div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:10px;font-size:13px;">
+                <span style="color:var(--text-muted);">Consultation Hours</span>
+                <span style="font-weight:600;">9 AM – 5 PM</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:10px;font-size:13px;">
+                <span style="color:var(--text-muted);">Department</span>
+                <span style="font-weight:600;">Cardiology</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;">
+                <span style="color:var(--text-muted);">Hospital</span>
+                <span style="font-weight:600;">Apollo Hospital</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-  </div>
+    <!-- ════════════════════════════════════════ -->
+    <!-- FIND DOCTORS / AVAILABLE DOCTORS -->
+    <!-- ════════════════════════════════════════ -->
+    <div class="page" *ngIf="activeView === 'doctors'">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Find a Doctor</div>
+          <div class="section-sub">{{filteredDoctors.length}} specialists available</div>
+        </div>
+      </div>
 
-</div>
+      <div class="search-bar">
+        <span style="font-size:18px;color:var(--text-muted);">🔍</span>
+        <input type="text" placeholder="Search by name, specialty, hospital..." [(ngModel)]="searchQuery">
+      </div>
+
+      <div class="filter-bar">
+        <div class="filter-chip" *ngFor="let s of specialties"
+          [class.active]="filterSpecialty === s"
+          (click)="filterSpecialty = s">{{s}}</div>
+      </div>
+
+      <div class="doctors-grid">
+        <div class="doctor-card" *ngFor="let d of filteredDoctors"
+          [style.border-top-color]="d.color" style="border-top-width:4px;">
+
+          <div class="doc-top">
+            <div class="doc-avatar" [style.background]="d.color">{{d.initials}}</div>
+            <div style="flex:1;min-width:0;">
+              <div class="doc-name">{{d.name}}</div>
+              <div class="doc-spec">{{d.specialty}}</div>
+              <div class="doc-hospital">🏥 {{d.hospital}}</div>
+            </div>
+            <div class="availability-dot" [class.on]="d.available" [class.off]="!d.available" [title]="d.available ? 'Available' : 'Unavailable'"></div>
+          </div>
+
+          <div class="doc-stats">
+            <div class="doc-stat">
+              <div class="doc-stat-val">{{d.rating}}</div>
+              <div class="doc-stat-key">Rating</div>
+            </div>
+            <div class="doc-stat">
+              <div class="doc-stat-val">{{d.experience}}y</div>
+              <div class="doc-stat-key">Experience</div>
+            </div>
+            <div class="doc-stat">
+              <div class="doc-stat-val">{{d.patientsToday}}</div>
+              <div class="doc-stat-key">Today</div>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+            <div class="stars">
+              <span *ngFor="let s of getStars(d.rating)">{{s ? '⭐' : '☆'}}</span>
+            </div>
+            <span style="font-size:12px;font-weight:600;"
+              [style.color]="d.available ? '#10b981' : '#94aaa8'">
+              {{d.available ? '🟢 Available · ' + d.nextSlot : '⚪ ' + d.nextSlot}}
+            </span>
+          </div>
+
+          <div class="doc-footer">
+            <div>
+              <div class="doc-fee">₹{{d.fee}}</div>
+              <div class="doc-fee-sub">per consultation</div>
+            </div>
+            <button class="btn btn-primary btn-sm" (click)="openBooking(d)" [disabled]="!d.available">
+              {{d.available ? '📅 Book Now' : 'Unavailable'}}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="filteredDoctors.length === 0"
+        style="text-align:center;padding:60px;color:var(--text-muted);">
+        <div style="font-size:48px;margin-bottom:12px;">🔍</div>
+        <div style="font-size:16px;font-weight:600;margin-bottom:6px;">No doctors found</div>
+        <div style="font-size:13px;">Try adjusting your filters or search terms</div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════ -->
+    <!-- BOOK APPOINTMENT -->
+    <!-- ════════════════════════════════════════ -->
+    <div class="page" *ngIf="activeView === 'book'">
+      <div class="booking-container">
+
+        <!-- Steps indicator -->
+        <div style="margin-bottom:48px;">
+          <div class="booking-steps">
+            <div class="step-item">
+              <div class="step-circle" style="position:relative;"
+                [class.active]="bookingStep === 1" [class.done]="bookingStep > 1">
+                {{bookingStep > 1 ? '✓' : '1'}}
+                <div class="step-label">Select Date</div>
+              </div>
+            </div>
+            <div class="step-line" [class.done]="bookingStep > 1"></div>
+            <div class="step-item">
+              <div class="step-circle" style="position:relative;"
+                [class.active]="bookingStep === 2" [class.done]="bookingStep > 2">
+                {{bookingStep > 2 ? '✓' : '2'}}
+                <div class="step-label">Pick Slot</div>
+              </div>
+            </div>
+            <div class="step-line" [class.done]="bookingStep > 2"></div>
+            <div class="step-item">
+              <div class="step-circle" style="position:relative;"
+                [class.active]="bookingStep === 3">
+                3
+                <div class="step-label">Confirm</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="booking-card">
+          <!-- Header -->
+          <div class="booking-card-header">
+            <div style="font-size:13px;opacity:.75;margin-bottom:4px;">Booking appointment with</div>
+            <div style="font-family:'Sora',sans-serif;font-size:22px;font-weight:800;">{{selectedDoctor?.name}}</div>
+            <div style="opacity:.8;font-size:14px;margin-top:4px;">{{selectedDoctor?.specialty}} · {{selectedDoctor?.hospital}}</div>
+          </div>
+
+          <!-- SUCCESS -->
+          <div class="success-state" *ngIf="bookingSuccess">
+            <div class="success-icon">🎉</div>
+            <div class="success-title">Appointment Booked!</div>
+            <div class="success-sub">Your appointment with <strong>{{selectedDoctor?.name}}</strong> on <strong>{{selectedDate}}</strong> at <strong>{{selectedSlot}}</strong> is confirmed. A reminder will be sent to your registered contact.</div>
+            <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+              <button class="btn btn-primary" (click)="setView('appointments')">View Appointments</button>
+              <button class="btn btn-outline" (click)="setView('doctors')">Book Another</button>
+            </div>
+          </div>
+
+          <!-- STEP 1 -->
+          <div class="booking-card-body" *ngIf="!bookingSuccess && bookingStep === 1">
+            <div class="selected-doc-card" *ngIf="selectedDoctor">
+              <div class="doc-avatar" style="width:48px;height:48px;border-radius:12px;font-size:15px;"
+                [style.background]="selectedDoctor.color">{{selectedDoctor.initials}}</div>
+              <div>
+                <div style="font-weight:700;font-size:15px;color:var(--text);">{{selectedDoctor.name}}</div>
+                <div style="font-size:13px;color:var(--text-muted);margin-top:2px;">{{selectedDoctor.specialty}} · ₹{{selectedDoctor.fee}} fee</div>
+                <div style="font-size:12px;color:#10b981;margin-top:4px;">⭐ {{selectedDoctor.rating}} · {{selectedDoctor.experience}} years experience</div>
+              </div>
+            </div>
+
+            <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:10px;">Select Appointment Date</div>
+            <input type="date" class="date-input" [(ngModel)]="selectedDate" [min]="today">
+
+            <div style="background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;padding:14px;margin-bottom:20px;">
+              <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:8px;">📋 WHAT TO BRING</div>
+              <div style="font-size:13px;color:var(--text-secondary);">• Valid photo ID &amp; insurance card</div>
+              <div style="font-size:13px;color:var(--text-secondary);">• List of current medications</div>
+              <div style="font-size:13px;color:var(--text-secondary);">• Previous medical records (if any)</div>
+            </div>
+
+            <button class="btn btn-primary btn-full" (click)="nextStep()">
+              Continue to Select Time Slot →
+            </button>
+          </div>
+
+          <!-- STEP 2 -->
+          <div class="booking-card-body" *ngIf="!bookingSuccess && bookingStep === 2">
+            <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;">Choose a Time Slot</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">📅 {{selectedDate}} · Greyed slots are unavailable</div>
+
+            <div class="slots-grid">
+              <div class="slot-btn"
+                *ngFor="let slot of timeSlots"
+                [class.selected]="selectedSlot === slot.time"
+                [class.unavailable]="!slot.available"
+                (click)="selectSlot(slot)">
+                {{slot.time}}
+                <div style="font-size:9px;margin-top:2px;opacity:.7;">{{slot.available ? 'Open' : 'Booked'}}</div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:12px;margin-top:4px;">
+              <button class="btn btn-outline" (click)="prevStep()">← Back</button>
+              <button class="btn btn-primary" style="flex:1;" (click)="nextStep()" [disabled]="!selectedSlot">
+                Review Booking →
+              </button>
+            </div>
+          </div>
+
+          <!-- STEP 3 -->
+          <div class="booking-card-body" *ngIf="!bookingSuccess && bookingStep === 3">
+            <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:16px;">Confirm Your Appointment</div>
+
+            <div style="background:var(--surface2);border:1.5px solid var(--border);border-radius:14px;padding:18px;margin-bottom:20px;">
+              <div class="summary-row">
+                <span class="summary-label">Doctor</span>
+                <span class="summary-value">{{selectedDoctor?.name}}</span>
+              </div>
+              <div class="summary-row">
+                <span class="summary-label">Specialty</span>
+                <span class="summary-value">{{selectedDoctor?.specialty}}</span>
+              </div>
+              <div class="summary-row">
+                <span class="summary-label">Hospital</span>
+                <span class="summary-value">{{selectedDoctor?.hospital}}</span>
+              </div>
+              <div class="summary-row">
+                <span class="summary-label">Date</span>
+                <span class="summary-value">{{selectedDate}}</span>
+              </div>
+              <div class="summary-row">
+                <span class="summary-label">Time</span>
+                <span class="summary-value">{{selectedSlot}}</span>
+              </div>
+              <div class="summary-row">
+                <span class="summary-label">Consultation Fee</span>
+                <span class="summary-value" style="color:var(--primary);font-family:'Sora',sans-serif;font-size:16px;">₹{{selectedDoctor?.fee}}</span>
+              </div>
+            </div>
+
+            <div style="background:#e0f2fe;border-radius:10px;padding:12px 14px;margin-bottom:20px;font-size:12px;color:#0369a1;">
+              ℹ️ By confirming, you agree to the cancellation policy. Cancellations made 24hrs+ before the appointment are fully refunded.
+            </div>
+
+            <div style="display:flex;gap:12px;">
+              <button class="btn btn-outline" (click)="prevStep()">← Back</button>
+              <button class="btn btn-primary" style="flex:1;" (click)="confirmBooking()">
+                ✅ Confirm Appointment
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════ -->
+    <!-- APPOINTMENTS PAGE (Patient + Doctor) -->
+    <!-- ════════════════════════════════════════ -->
+    <div class="page" *ngIf="activeView === 'appointments'">
+      <div class="section-header">
+        <div>
+          <div class="section-title">{{activeRole === 'doctor' ? 'All Patient Appointments' : 'My Appointments'}}</div>
+          <div class="section-sub">{{filteredAppointments.length}} records found</div>
+        </div>
+        <button class="btn btn-primary" (click)="setView('doctors')" *ngIf="activeRole === 'patient'">
+          📅 Book New
+        </button>
+      </div>
+
+      <!-- Filter tabs -->
+      <div class="filter-bar">
+        <div class="filter-chip" [class.active]="appointmentFilter === 'all'" (click)="appointmentFilter = 'all'">All ({{appointments.length}})</div>
+        <div class="filter-chip" [class.active]="appointmentFilter === 'upcoming'" (click)="appointmentFilter = 'upcoming'">Upcoming ({{upcomingCount}})</div>
+        <div class="filter-chip" [class.active]="appointmentFilter === 'pending'" (click)="appointmentFilter = 'pending'">Pending ({{pendingCount}})</div>
+        <div class="filter-chip" [class.active]="appointmentFilter === 'completed'" (click)="appointmentFilter = 'completed'">Completed ({{completedCount}})</div>
+        <div class="filter-chip" [class.active]="appointmentFilter === 'cancelled'" (click)="appointmentFilter = 'cancelled'">Cancelled</div>
+      </div>
+
+      <!-- Table -->
+      <div class="card">
+        <div class="appts-table-header">
+          <div>{{activeRole === 'doctor' ? 'Patient' : 'Doctor'}}</div>
+          <div>Details</div>
+          <div>Date & Time</div>
+          <div>Status</div>
+          <div>Type</div>
+          <div *ngIf="activeRole === 'doctor'">Actions</div>
+        </div>
+
+        <div class="appts-table-row" *ngFor="let a of filteredAppointments">
+          <!-- Patient/Doctor name -->
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="avatar" style="width:36px;height:36px;border-radius:9px;font-size:12px;"
+              [style.background]="a.avatarColor">{{a.patientInitials}}</div>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--text);">
+                {{activeRole === 'doctor' ? a.patientName : a.doctorName}}
+              </div>
+              <div style="font-size:11px;color:var(--text-muted);">
+                {{activeRole === 'doctor' ? 'Age ' + a.age : 'ID #' + a.id}}
+              </div>
+            </div>
+          </div>
+          <!-- Specialty -->
+          <div>
+            <div style="font-size:13px;font-weight:500;">{{a.specialty}}</div>
+            <div style="font-size:11px;color:var(--text-muted);">{{activeRole === 'doctor' ? a.doctorName : a.patientName}}</div>
+          </div>
+          <!-- Date -->
+          <div>
+            <div style="font-size:13px;font-weight:600;">{{a.time}}</div>
+            <div style="font-size:11px;color:var(--text-muted);">{{a.date}}</div>
+          </div>
+          <!-- Status -->
+          <div>
+            <span class="badge" [class]="'badge-' + a.status">{{a.status | titlecase}}</span>
+          </div>
+          <!-- Type -->
+          <div>
+            <span class="badge" [class]="a.type === 'video' ? 'badge-video' : 'badge-inperson'">
+              {{a.type === 'video' ? '🎥 Video' : '🏥 In-Person'}}
+            </span>
+          </div>
+          <!-- Doctor actions -->
+          <div class="action-row" *ngIf="activeRole === 'doctor'">
+            <button class="btn btn-success btn-sm" *ngIf="a.status !== 'completed' && a.status !== 'cancelled'"
+              (click)="updateStatus(a, 'completed')">✓</button>
+            <button class="btn btn-danger btn-sm" *ngIf="a.status !== 'cancelled' && a.status !== 'completed'"
+              (click)="updateStatus(a, 'cancelled')">✕</button>
+          </div>
+        </div>
+
+        <div *ngIf="filteredAppointments.length === 0"
+          style="padding:48px;text-align:center;color:var(--text-muted);">
+          <div style="font-size:36px;margin-bottom:10px;">📋</div>
+          <div>No appointments in this category</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════ -->
+    <!-- PATIENTS PAGE (Doctor only) -->
+    <!-- ════════════════════════════════════════ -->
+    <div class="page" *ngIf="activeView === 'patients'">
+      <div class="section-header">
+        <div>
+          <div class="section-title">My Patients</div>
+          <div class="section-sub">{{appointments.length}} unique patient records</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;">
+        <div class="card" style="padding:20px;" *ngFor="let a of appointments">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+            <div class="avatar" style="width:46px;height:46px;border-radius:12px;font-size:14px;"
+              [style.background]="a.avatarColor">{{a.patientInitials}}</div>
+            <div>
+              <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;">{{a.patientName}}</div>
+              <div style="font-size:12px;color:var(--text-muted);">Age {{a.age}} · Patient #{{a.id}}</div>
+            </div>
+          </div>
+          <div style="background:var(--surface2);border-radius:10px;padding:12px;margin-bottom:14px;">
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;">
+              <span style="color:var(--text-muted);">Last Visit</span>
+              <span style="font-weight:600;">{{a.date}}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;">
+              <span style="color:var(--text-muted);">Specialty</span>
+              <span style="font-weight:600;">{{a.specialty}}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;">
+              <span style="color:var(--text-muted);">Status</span>
+              <span class="badge" [class]="'badge-' + a.status">{{a.status | titlecase}}</span>
+            </div>
+          </div>
+          <button class="btn btn-outline btn-full btn-sm">View Full Record</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════ -->
+    <!-- SCHEDULE PAGE (Doctor only) -->
+    <!-- ════════════════════════════════════════ -->
+    <div class="page" *ngIf="activeView === 'schedule'">
+      <div class="section-header">
+        <div>
+          <div class="section-title">My Schedule</div>
+          <div class="section-sub">Today — {{today}}</div>
+        </div>
+        <span class="badge badge-upcoming" style="font-size:13px;padding:7px 16px;">🟢 On Duty</span>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Today's Timeline</div>
+          </div>
+          <div class="card-body" style="padding-top:8px;padding-bottom:8px;">
+            <div class="schedule-item" *ngFor="let a of doctorTodayAppointments">
+              <div class="schedule-time-block">
+                <div class="sch-time">{{a.time.split(' ')[0]}}</div>
+                <div class="sch-period">{{a.time.split(' ')[1]}}</div>
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div class="sch-patient">{{a.patientName}}</div>
+                <div class="sch-detail">{{a.specialty}} · {{a.type === 'video' ? '🎥 Video' : '🏥 In-Person'}}</div>
+              </div>
+              <span class="badge" [class]="'badge-' + a.status">{{a.status | titlecase}}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Availability Settings</div></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--surface2);border-radius:10px;border:1px solid var(--border);">
+                <div>
+                  <div style="font-size:13px;font-weight:600;">Morning Shift</div>
+                  <div style="font-size:12px;color:var(--text-muted);">9:00 AM – 12:00 PM</div>
+                </div>
+                <span class="badge badge-completed">Active</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--surface2);border-radius:10px;border:1px solid var(--border);">
+                <div>
+                  <div style="font-size:13px;font-weight:600;">Afternoon Shift</div>
+                  <div style="font-size:12px;color:var(--text-muted);">2:00 PM – 5:00 PM</div>
+                </div>
+                <span class="badge badge-completed">Active</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--surface2);border-radius:10px;border:1px solid var(--border);">
+                <div>
+                  <div style="font-size:13px;font-weight:600;">Emergency</div>
+                  <div style="font-size:12px;color:var(--text-muted);">On-call only</div>
+                </div>
+                <span class="badge badge-cancelled">Off</span>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-full" style="margin-top:16px;">Edit Availability</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end .main -->
+</div><!-- end .app-shell -->
