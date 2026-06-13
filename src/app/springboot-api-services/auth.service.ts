@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AuthDB } from '../models/AuthDB';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -13,7 +13,7 @@ export class AuthService {
   private auth_register_url = `${this.apiBaseUrl}/auth-service/register`;
   private auth_login_url = `${this.apiBaseUrl}/auth-service/login`;
   private auth_logout_url = `${this.apiBaseUrl}/auth-service/logout`;
-  private chat_api_url = `${this.apiBaseUrl}/ai/ask`;
+  private chat_api_url = `${this.apiBaseUrl}/ai/chat`;
 
   constructor(private http: HttpClient) {}
   private loggedIn = new BehaviorSubject<boolean>(false); // ← default false
@@ -100,12 +100,17 @@ export class AuthService {
   // ─────────────────────────────────────────
   // AI CHAT
   // ─────────────────────────────────────────
+  
   sendMessage(message: string): Observable<string> {
-    const params = new HttpParams().set('query', message);
-    return this.http.get(this.chat_api_url, {
-      params,
-      responseType: 'text',
-      withCredentials: true, // ← sends cookie if chat is protected
-    });
-  }
+  const params = new HttpParams().set('query', message);
+
+  return this.http.get(this.chat_api_url, {
+    params,
+    responseType: 'text',
+    headers: new HttpHeaders({
+      'Accept': 'text/plain',        // Tell server you want plain text
+      'Content-Type': 'application/json'
+    })
+  });
+}
 }
