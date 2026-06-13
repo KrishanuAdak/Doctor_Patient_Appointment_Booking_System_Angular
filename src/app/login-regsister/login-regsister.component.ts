@@ -35,7 +35,7 @@ export class LoginRegisterComponent implements OnInit {
     name: '',
     email: '',
     password: '',
-    phone: '',
+    username: '',
   };
 
   constructor(
@@ -81,6 +81,7 @@ export class LoginRegisterComponent implements OnInit {
       email: this.userDetails.email,
       password: this.userDetails.password,
       role: this.role,
+      username: this.userDetails.username
     };
 
     this.authService.loginUser(payload).subscribe({
@@ -98,10 +99,9 @@ export class LoginRegisterComponent implements OnInit {
     this.isLoading = true;
 
     const payload = {
-      name: this.userDetails.name,
       email: this.userDetails.email,
       password: this.userDetails.password,
-      phone: this.userDetails.phone,
+      username: this.userDetails.username,
       role: this.role,
     };
 
@@ -139,7 +139,7 @@ export class LoginRegisterComponent implements OnInit {
       name: '',
       email: '',
       password: '',
-      phone: '',
+      username: '',
     };
     this.showPassword = false;
     this.submitSuccess = false;

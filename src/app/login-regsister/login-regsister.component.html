@@ -82,9 +82,9 @@
           <input
             type="text"
             name="name"
-            [(ngModel)]="userDetails.name"
+            [(ngModel)]="userDetails.username"
             #name="ngModel"
-            placeholder="Dr. John Doe"
+            placeholder=" John Doe"
             required
           >
         </div>
@@ -131,7 +131,7 @@
             #password="ngModel"
             placeholder="••••••••"
             required
-            minlength="6"
+            minlength="8"
           >
           <button type="button" class="pw-toggle" (click)="togglePassword()" aria-label="Show/hide password">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">

@@ -1,31 +1,63 @@
-import { Component } from '@angular/core';
-import { AuthService } from '../springboot-api-services/auth.service'; // Adjust the path as necessary
+import { Component, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-@Component({
-  selector: 'app-dashboard-navbar',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './dashboard-navbar.component.html',
-  styleUrl: './dashboard-navbar.component.css',
-  providers: [AuthService]
-})
-export class DashboardNavbarComponent {
-  username: string | null = null;
-    userRole: string | null = null;
-    constructor(private authService: AuthService) {
-      //  this.username = this.authService.getUsername();
-      //  this.userRole = this.authService.extractUserRole();
-        console.log('username',this.username);
-        console.log('userRole',this.userRole);
-    }
-  
-    
-  
-     logout(){
-      this.authService.logout();
-      window.location.reload(); // Reload the page to reflect the logout
-     }
-  
-     
+import { Router, RouterModule } from '@angular/router';
 
+interface NavLink {
+  label: string;
+  icon: string;
+  route: string;
+  idx: number;
+}
+
+@Component({
+  selector: 'app-navbar',
+  standalone: true,
+  imports: [CommonModule, RouterModule],
+  templateUrl: './dashboard-navbar.component.html',
+  styleUrls: ['./dashboard-navbar.component.css']
+})
+export class DashboardNavbarComponent implements AfterViewInit {
+
+  @ViewChild('nbLinks') nbLinksRef!: ElementRef;
+  @ViewChild('nbPill') nbPillRef!: ElementRef;
+
+  activeIdx = 0;
+
+  navLinks: NavLink[] = [
+    { label: 'Home',         icon: 'ti-home',        route: '/home',         idx: 0 },
+    { label: 'Appointments', icon: 'ti-calendar',    route: '/appointments', idx: 1 },
+    { label: 'Doctors',      icon: 'ti-stethoscope', route: '/doctors',      idx: 2 },
+    { label: 'Reports',      icon: 'ti-chart-bar',   route: '/reports',      idx: 3 },
+    { label: 'Settings',     icon: 'ti-settings',    route: '/settings',     idx: 4 },
+  ];
+
+  constructor(private router: Router) {}
+
+  ngAfterViewInit(): void {
+    setTimeout(() => this.movePill(this.activeIdx), 300);
+    window.addEventListener('resize', () => this.movePill(this.activeIdx));
+  }
+
+  setActive(idx: number): void {
+    this.activeIdx = idx;
+    this.movePill(idx);
+    this.router.navigate([this.navLinks[idx].route]);
+  }
+
+  movePill(idx: number): void {
+    const container = this.nbLinksRef?.nativeElement;
+    const linkEls = container?.querySelectorAll('.nb-link');
+    const pill = this.nbPillRef?.nativeElement;
+    if (!container || !linkEls || !pill) return;
+
+    const el = linkEls[idx];
+    const cr = container.getBoundingClientRect();
+    const er = el.getBoundingClientRect();
+    pill.style.left  = (er.left - cr.left) + 'px';
+    pill.style.width = er.width + 'px';
+  }
+
+  get activeLabel(): string {
+    return this.navLinks[this.activeIdx]?.label ?? '';
+  }
 }

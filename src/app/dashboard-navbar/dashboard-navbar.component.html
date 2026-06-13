@@ -1,19 +1,46 @@
-<div class="container-fluid p-4" [@fadeIn]>
-  <h2 class="mb-4 text-center">Welcome, {{ username }} 🎉</h2>
+<div class="nb-wrap">
+  <nav class="navbar">
 
-
-
-
- <nav class="navbar" >
-   <div class="navbar-brand"><a href="/dashboard" style="text-decoration: none;">🏥 Doctor-Patient Portal</a></div>
-  <ul class="navbar-links">
-    <li><a href="/accounts" routerLinkActive="active">Accounts</a></li>
-    <li><a routerLink="/history" routerLinkActive="active">History</a></li>
-    <li><a href="/appointments" routerLinkActive="active" target="_blank" *ngIf="userRole?.toLocaleLowerCase() === 'patient'">Appointments</a></li>
-    <li>          <a class="nav-link" href="/available" routerLinkActive="active" *ngIf="userRole?.toLocaleLowerCase() === 'doctor'">Your availability
+    <!-- Logo -->
+    <a class="nb-logo nb-logo-enter" routerLink="/">
+      <div class="nb-logo-icon">🏥</div>
+      <div class="nb-logo-text">MediCare</div>
     </a>
-</li>
-    <li><a routerLink="/stories" routerLinkActive="active">Stories</a></li>
-    <li><button (click)="logout()" class="logout-btn">Logout</button></li>
-  </ul>
-</nav> 
+
+    <!-- Nav Links -->
+    <div class="nb-links" #nbLinks>
+      <div class="nb-pill" #nbPill></div>
+
+      <div
+        *ngFor="let link of navLinks"
+        class="nb-link nb-link-enter"
+        [class.active]="activeIdx === link.idx"
+        [style.animation-delay]="(0.1 + link.idx * 0.06) + 's'"
+        (click)="setActive(link.idx)">
+        <i class="ti {{ link.icon }}"></i>
+        <span>{{ link.label }}</span>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="nb-actions nb-act-enter">
+      <div class="nb-notif" title="Notifications">
+        <i class="ti ti-bell"></i>
+        <div class="nb-dot"></div>
+      </div>
+      <button class="nb-btn nb-btn-ghost">Sign in</button>
+      <button class="nb-btn nb-btn-solid">Get started</button>
+      <div class="nb-avatar" title="Krish">KA</div>
+    </div>
+
+  </nav>
+
+  <!-- Active page hint -->
+  <div class="nb-preview">
+    <div class="nb-preview-text">Active page</div>
+    <div class="nb-page-hint">
+      <span class="blink-dot"></span>
+      <span class="page-label">{{ activeLabel }}</span>
+    </div>
+  </div>
+</div> 
