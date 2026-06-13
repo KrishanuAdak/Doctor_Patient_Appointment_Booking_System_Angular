@@ -1,6 +1,7 @@
 import { Component, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../springboot-api-services/auth.service';
 
 interface NavLink {
   label: string;
@@ -30,8 +31,9 @@ export class DashboardNavbarComponent implements AfterViewInit {
     { label: 'Reports',      icon: 'ti-chart-bar',   route: '/reports',      idx: 3 },
     { label: 'Settings',     icon: 'ti-settings',    route: '/settings',     idx: 4 },
   ];
+  username:string='';
 
-  constructor(private router: Router) {}
+  constructor(private router: Router,private service:AuthService) {}
 
   ngAfterViewInit(): void {
     setTimeout(() => this.movePill(this.activeIdx), 300);
@@ -59,5 +61,12 @@ export class DashboardNavbarComponent implements AfterViewInit {
 
   get activeLabel(): string {
     return this.navLinks[this.activeIdx]?.label ?? '';
+  }
+  getUserName(){
+    return this.service.getProfile().subscribe(res=>{
+      this.username=res;
+      console.log(this.username);
+
+    })
   }
 }

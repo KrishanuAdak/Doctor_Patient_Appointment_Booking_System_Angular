@@ -14,6 +14,11 @@ export class AuthService {
   private auth_login_url = `${this.apiBaseUrl}/auth-service/login`;
   private auth_logout_url = `${this.apiBaseUrl}/auth-service/logout`;
   private chat_api_url = `${this.apiBaseUrl}/ai/chat`;
+  //private auth_register_url = "http://localhost:9000/auth-service/register";
+  // private auth_login_url = "http://localhost:9000/auth-service/login";
+  // private auth_logout_url = "http://localhost:9000/auth-service/logout";
+  // private chat_api_url = `${this.apiBaseUrl}/ai/chat`;
+
 
   constructor(private http: HttpClient) {}
   private loggedIn = new BehaviorSubject<boolean>(false); // ← default false
@@ -32,6 +37,7 @@ export class AuthService {
       withCredentials: true, // ← receives HttpOnly cookie from Spring Boot
     });
   }
+
 
   // ─────────────────────────────────────────
   // LOGIN
@@ -76,8 +82,8 @@ export class AuthService {
   // GET CURRENT USER PROFILE
   // Spring Boot reads JWT from cookie and returns user info
   // ─────────────────────────────────────────
-  getProfile(): Observable<any> {
-    return this.http.get<any>(`${this.apiBaseUrl}/auth-service/profile`, {
+  getProfile(): Observable<string> {
+    return this.http.get<string>("http://localhost:9000/auth-service/auth-service/get-user", {
       withCredentials: true,
     });
   }
