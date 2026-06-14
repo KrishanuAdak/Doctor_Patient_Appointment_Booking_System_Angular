@@ -19,6 +19,7 @@ interface NavLink {
 })
 export class DashboardNavbarComponent implements AfterViewInit {
 
+
   @ViewChild('nbLinks') nbLinksRef!: ElementRef;
   @ViewChild('nbPill') nbPillRef!: ElementRef;
 
@@ -58,6 +59,11 @@ export class DashboardNavbarComponent implements AfterViewInit {
     pill.style.left  = (er.left - cr.left) + 'px';
     pill.style.width = er.width + 'px';
   }
+  logout() {
+    this.service.logout();
+    this.router.navigate(['login/register']);
+}
+
 
   get activeLabel(): string {
     return this.navLinks[this.activeIdx]?.label ?? '';
